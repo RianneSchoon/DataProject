@@ -23,7 +23,7 @@ This project aims to address the magnitude of air pollution by greenhouse gases,
 * Checkbox of map (total emissions / CO2 / other than CO2)
 
 ### Sketches:
-![](doc/image.png)
+![](doc/plaatjejoepie.png)
 
 ## Prerequisites
 
