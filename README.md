@@ -20,6 +20,22 @@ This project aims to address the magnitude of air pollution by greenhouse gases,
 * When clicking a country on the map, the scatterplot is updated according to that country. All different time points are visible in the scatterplot, but the 'current' time has the highest opacity.
 * Different time points can be selected - apply to all graphs.
 * "Global" option. When clicked, the barchart shows the global average sources of greenhouse gas emissions, and the scatterplot shows all countries again for the 'current' time.
+* Checkbox of map (total emissions / CO2 / other than CO2)
 
 ### Sketches:
 ![](doc/image.png)
+
+## Prerequisites
+
+### Data sources
+* https://data.worldbank.org
+* http://apps.who.int/gho/data/node.main.122?lang=en
+
+### External components
+* d3js.org/d3.v3.min.js"
+* d3js.org/topojson.v1.min.js"
+* d3js.org/queue.v1.min.js"
+* labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"
+
+### Hardest parts
+The hardest part is going to be the coloring of the map - I have not done that in previous weeks, so that is new.
