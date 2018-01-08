@@ -22,3 +22,4 @@ This project aims to address the magnitude of air pollution by greenhouse gases,
 * "Global" option. When clicked, the barchart shows the global average sources of greenhouse gas emissions, and the scatterplot shows all countries again for the 'current' time.
 
 ### Sketches:
+![](doc/image.png)
