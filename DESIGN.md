@@ -35,7 +35,7 @@ Technical details of the project: seperate parts of the web application, APIs, m
 * .js "library" where all functions for making graphs live (called in make-graph function in main)
     not sure yet whether I want seperate library files with functions per graph.
 * .css for styling of the visualizations and the website
-* most likely will need queue() function. I am however not sure. For the map and scatterplot, it is the most useful to have the data in a JSON with first key "year". For the linegraph however, a JSON with first key of "care" is most useful. See attachment with data.
+* most likely will need queue() function. I am however not sure. For the map and scatterplot, it is the most useful to have the data in a JSON with first key "year". For the linegraph however, a JSON with first key of "care" is most useful. See attachment with data. So I am not sure whether I go with one of those JSONs and have a hard time with the line graph, or just load two JSONS and have a sslightly worse grade on "design". I will see how i progress in time, to make a decision.
 
 ## Functionality
 * d3js.org/d3.v3.min.js
