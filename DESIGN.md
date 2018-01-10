@@ -2,7 +2,10 @@
 
 Technical details of the project: seperate parts of the web application, APIs, methods, techniques, features.
 
-## Technical components
+## Technical components 
+
+### Diagram
+![](doc/Dia1.PNG)
 
 ### Visualisations:
 * **Map of the world** depicting three types of care (physician density, nurse density, hospital bed density) and life expectancy. The user can select which variable they want to see coloured in the map (radiobutton). Countries can be clicked to see specific info in the line graph. Tooltips popup on hover to show country name and variable value - MVP.
@@ -18,9 +21,28 @@ Technical details of the project: seperate parts of the web application, APIs, m
 * Checkbox of scatterplot variables (physicians, nurses, hospital beds, life expectancy, GDP) - MVP -, and where to display that variable (x-axis, y-axis, dotsize, color) - Extra.
 * Zoom functionality in the line graph, since data spans 46 years - Extra.
 
+### Implementation
+* Legend must be coupled to map (colors update), scatterplot (axes update), and line graph (line pop-out)
+* Map countries must be coupled to line graph (update graph for clicked country). TopoJSON needed. 
+* Lines in line graph must be coupled to scatterplot (axes update)
+* Slider must be coupled to map and scatterplot (update according to year)
+* Legend for scatterplot coupled to dots in scatterplot
+* Menu for scatterplot with variables and axes: scope within scatterplot.
+
+#### Code flow
+* html file (bootstrap)
+* .js "main" where data is called and make-graph function is called
+* .js "library" where all functions for making graphs live (called in make-graph function in main)
+    not sure yet whether I want seperate library files with functions per graph.
+* .css for styling of the visualizations and the website
+* most likely will need queue() function. I am however not sure. For the map and scatterplot, it is the most useful to have the data in a JSON with first key "year". For the linegraph however, a JSON with first key of "care" is most useful. See attachment with data.
 
 ## Functionality
+* d3js.org/d3.v3.min.js
+* d3js.org/topojson.v1.min.js
+* d3js.org/queue.v1.min.js
+* labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js
+* jQuery
 
 ## Data sources
-
 * http://www.oecd.org/health/health-statistics.htm
