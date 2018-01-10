@@ -22,9 +22,10 @@ This project aims to let a user explore the effectiveness of different aid on th
 * Clickable legend in the line graph to let one variable line pop-out with higher opacity - Extra.
 * Checkbox of map variables (physicians, nurses, hospital beds, life expectancy, GDP) - MVP.
 * Checkbox of scatterplot variables (physicians, nurses, hospital beds, life expectancy, GDP) - MVP -, and where to display that variable (x-axis, y-axis, dotsize, color) - Extra.
+* Zoom functionality in the line graph, since data spans 46 years - Extra.
 
 ### Sketches:
-![](doc/plaatjejoepie.png)
+![](doc/sketch.png)
 
 ## Prerequisites
 
@@ -36,6 +37,7 @@ This project aims to let a user explore the effectiveness of different aid on th
 * d3js.org/topojson.v1.min.js
 * d3js.org/queue.v1.min.js
 * labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js
+* jQuery
 
 ### Hardest parts
 The hardest part is going to be the coloring of the map - I have not done that in previous weeks, so that is new.
