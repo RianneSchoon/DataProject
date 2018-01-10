@@ -1,4 +1,4 @@
-# Data Processing - Programming Project Proposal
+# Data Processing - Programming Project
 
 Do you want to live forever? When asked, most people will answer affirmatively. Unfortunately though, even if we are not afflicted by accidents or crimes, we would still have to live to eternity through disease, infections, and eventually wear and tear due to old age. Nonetheless, we still try to prolong our lives as much as possible. The success of this endeavor varies greatly. Let us explore some possible supporting means and their influence on life expectancy across the world!
 
