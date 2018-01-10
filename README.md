@@ -6,12 +6,12 @@ Do you want to live forever? When asked, most people will answer affirmatively. 
 We can wonder whether reaching old age is an achievement of operational interventions by modern medicine, or something else. Maybe just receiving aid, as given by nurses or provided by a hospital, is important. Or, perhaps, having access to enough food and good housing is important, for which money is needed. Since this is not known by many people, this visualization offers a hand!
 
 ### Solution
-This project aims to let a user explore the effectiveness of different aid on the life expextancy of people. The website offers information about the above mentioned types of aid and allows the user to select, adjust, and test the questions raised. The visualizations provide an overview of the aid that countries around the world provide their people with. For each country, the development of this aid can be studied over time. Also, several types of aid or their effect on life expectancy can be correlated, with the user selecting which correlation they want to investigate.
+This project aims to let a user explore the effectiveness of health care on the life expextancy of people. The website offers information about the above mentioned types of care and allows the user to select, adjust, and test the questions raised. The visualizations provide an overview of the care that countries around the world provide their people with. For each country, the development of care can be studied over time. Also, several types of care or their effect on life expectancy can be correlated, with the user selecting which correlation they want to investigate.
 
 ## General layout of the project
 
 ### Visualisations:
-* **Map of the world** depicting three types of aid (physician density, nurse density, hospital bed density) and life expectancy. The user can select which variable they want to see coloured in the map (radiobutton). Countries can be clicked to see specific info in the line graph. Tooltips popup on hover to show country name and variable value - MVP.
+* **Map of the world** depicting three types of care (physician density, nurse density, hospital bed density) and life expectancy. The user can select which variable they want to see coloured in the map (radiobutton). Countries can be clicked to see specific info in the line graph. Tooltips popup on hover to show country name and variable value - MVP.
 * **Multiple lines graph** per country that shows the three types of aid (y1-axis) and life expectancy (y2-axis) in time. Legend is checkbox to make one of the variables pop-out (opacity). Lines can be clicked to see correlation to life expectancy in the scatterplot - MVP.
 * **Scatterplot** that shows the relation between the variable clicked in the line chart and life expectancy, for all countries. In this specific after-line-click-case, the size of the dots represents Gross Domestic Product, and the color of the dots differentiates males and females (since females have a higher average life expectancy) - MVP. Extra: furthermore, the scatterplot can be customized by the user: every variable can be plotted against every other, both on the axes and in dot size and in the color. 
 
@@ -25,6 +25,7 @@ This project aims to let a user explore the effectiveness of different aid on th
 * Zoom functionality in the line graph, since data spans 46 years - Extra.
 
 ### Sketches:
+I left my phone at home so i cannot upload a photo. Will do this asap.
 ![](doc/sketch.png)
 
 ## Prerequisites
