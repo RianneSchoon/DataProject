@@ -26,7 +26,7 @@ This project aims to let a user explore the effectiveness of health care on the 
 
 ### Sketches:
 I left my phone at home so i cannot upload a photo. Will do this asap.
-![](doc/Dia1.png)
+![](doc/Dia1.PNG.png)
 
 ## Prerequisites
 
