@@ -1,0 +1,106 @@
+/*
+linked.css
+Style sheet to a webpage that shows two linked visualizations.
+
+Rianne Schoon, 10742794
+
+Sources and credits:
+*/
+
+/* line around country on hover */
+.country:hover{
+  stroke: gold;
+  stroke-width: 3px;
+}
+
+/* page title centered */
+.title {
+  text-align: center;
+  font: 30px tahoma;
+}
+
+/* my name centered */
+.name {
+  text-align: center;
+  font: 21px tahoma;
+}
+
+/* introtext and data source styling */
+.intro, 
+.source {
+  text-align: center;
+  font: 15px tahoma;
+  line-height: 1.5;
+  margin-top: 15px;
+  margin-bottom: 5px;
+}
+
+.text{
+  font-size:10px;
+  text-align: center;
+}
+
+#container {
+  margin:10px 10%;
+  border:2px solid royalblue;
+  border-radius: 5px;
+  height:100%;
+  overflow:hidden;
+  background: lightcyan;
+}
+
+.hidden { 
+  display: none; 
+}
+
+div.tooltip {
+  color: royalblue; 
+  background: lightcyan; 
+  padding: .5em; 
+  text-align: center;
+  font: 15px tahoma;
+  border-radius: 2px; 
+  box-shadow: 0px 0px 2px 0px royalblue; 
+  opacity: 0.9; 
+  position: absolute;
+}
+
+.equator {
+  stroke: powderblue;
+  stroke-width: 1px;
+}
+
+/* font for axes and ticks */
+#scatter {
+  font: 10px tahoma;
+  text-align: center;
+  color: black;
+}
+
+/* color axes */
+.axis path,
+.axis line {
+  fill: none;
+  stroke: royalblue;
+  stroke-width: 1.8px;
+  shape-rendering: crispEdges;
+}
+
+/* dot stroke color default */
+.dot {
+  stroke: white;
+}
+
+.sct
+{
+    position: absolute;
+    margin:auto;
+}
+
+#about-section {
+    padding: 0px;
+}
+
+#works-section {
+    padding: 0px;
+}
