@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <!-- Bootstrap -->
+  <link rel="stylesheet" type="text/css"  href="css/bootstrap.css">
+  <link rel="stylesheet" type="text/css" href="fonts/font-awesome/css/font-awesome.css">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" type="text/css"  href="css/style.css">
+  <link rel="stylesheet" type="text/css" href="css/prettyPhoto.css">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,900,300' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,800,600,300' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="project.css"></link>
+  <script type="text/javascript" src="js/modernizr.custom.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+  <script src="//datamaps.github.io/scripts/0.4.4/datamaps.world.min.js"></script>
+  <script src="//d3js.org/queue.v1.min.js"></script>
+  <script src="project.js" charset="utf-8"></script>
+</head>
+<body>
+<!-- Navigation -->
+<nav id="menu" class="navbar navbar-default navbar-fixed-top">
+  <div class="container"> 
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header" 
+      <a class="navbar-brand"><i class="fa fa-sun-o"></i><strong> Rianne Schoon</strong><br>Project data processing</a>
+    </div>
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="#home" class="page-scroll">Home</a></li>
+        <li><a href="#services-section" class="page-scroll">Intro</a></li>
+        <li><a href="#works-section" class="page-scroll">World map</a></li>
+        <li><a href="#about-section" class="page-scroll">Line graph</a></li>
+        <li><a href="#works-section" class="page-scroll">Scatterplot</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<!-- Header -->
+<header class="text-center" name="home">
+  <div class="intro-text">
+    <h1>Welcome - <strong>Enjoy!</strong></h1>
+    <p>Programming project Data Processing by Rianne Schoon</p>
+    <a href="#services-section" class="btn btn-default btn-lg page-scroll">To the intro</a> 
+  </div>
+</header>
+<!-- Services Section -->
+<div id="services-section" class="text-center">
+  <div class="container">
+    <div class="section-title center">
+      <h2>Introduction</h2>
+      <hr>
+      <div class="clearfix"></div>
+      <p><strong>Do you want to live forever?</strong><br>Most people do. But even if you avoid accidents and murderers, you still have to face <br>disease, infections, and eventually wear and tear due to old age - to eternity.<br>Nonetheless, we still try to prolong our lives as much as possible. The success of this endeavor varies greatly.<br><strong></p><p>Let us explore some possible supporting means of health care and their influence on life expectancy around the world!</strong></p>
+      <div class="space"></div>
+      <p>The <b>map</b> shows the life expectancy of countries in the world. You can also choose to see the amount<br>of <i>doctors</i>, <i>nurses</i>, <i>available hospital beds</i>, or the <i>Gross Domestic Product</i>. Darker colors mean higher values.<br>Slide the <b>bar</b> to select the year you want to see data of.<br>Click on a country to see its data in the other graphs!
+      </p>
+      <div class="space"></div>
+      <p>The <b>line graph</b> shows the amount of <i>care variables</i>, <i>GDP</i>, and <i>life expectancy</i> for a selected country over time.<br>You can select a line to update the <b>scatterplot</b> and see the relation between variables.
+      <p>Hover over countries on the map, lines, and dots to see additional information pop up!<br>Click <b>checkboxes</b> to select data.<br>
+      </p>
+    </div>
+  </div>
+</div>
+<!-- Worldmap Section -->
+<div id="works-section">
+  <!-- Container -->
+  <div class="section-title text-center center">
+    <h2>World map</h2>
+    <hr>
+    <div class="clearfix"></div>
+    <div class="chart" id="container0" style="position: relative; width: 750px; height: 450px;"> 
+    </div>
+    <div class="source">
+    <a href="http://www.oecd.org/health/health-statistics.htm">Data source: Organisation for Economic Co-operation and Development</a>
+    </div>
+  </div>
+  <form>
+    <div class="timeslider">
+      <p>Select a year</p>
+      <input id="slider1" type="range" min="1960" max="2016" value="2000" step="1" />
+    </div> 
+  </form>
+  <form>
+    <div class="radio">
+      <p>Select health care variable</p>
+      <input type="radio" name="chooseone" value="HTML"><label for="HTML"> HTML</label><br>
+      <input type="radio" name="chooseone" value="CSS"><label for="CSS"> CSS</label><br>
+      <input type="radio" name="chooseone" value="JS"><label for="JS"> JS</label><br>
+      <input type="radio" name="chooseone" value="PHP"><label for="PHP"> PHP</label><br>
+      <input type="radio" name="chooseone" value="Ruby"><label for="Ruby"> Ruby</label><br>
+      <input type="radio" name="chooseone" value="INTERCAL"><label for="INTERCAL"> INTERCAL</label><br>
+    </div> 
+  </form>
+
+</div>
+<!-- </div> -->
+<!-- Line chart Section -->
+<div id="about-section">
+  <div class="container">
+    <div class="section-title text-center center">
+      <h2>Line graph</h2>
+      <hr>
+      <div class="clearfix"></div>
+      <div class="chart" id="line">
+      </div>
+      <div class="source">
+      <a href="http://www.oecd.org/health/health-statistics.htm">Data source: Organisation for Economic Co-operation and Development</a>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- </div> -->
+<div id="works-section">
+  <div class="container">
+    <div class="section-title text-center center">
+      <h2>Scatterplot</h2>
+      <hr>
+      <div class="clearfix"></div>
+      <div class="chart" id="scatter">
+      </div>
+      <div class="source">
+      <a href="http://www.oecd.org/health/health-statistics.htm">Data source: Organisation for Economic Co-operation and Development</a>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Footer Section -->
+<div id="footer">
+  <div class="container">
+    <div class="fnav">
+      <p>Project Dataprocessing  by <b>Rianne Schoon</b> 10742794<br>Copyright &copy; Helios. Designed by <a href="http://www.templatewire.com" rel="nofollow">TemplateWire</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> 
+<script type="text/javascript" src="js/jquery.1.11.1.js"></script> 
+<!-- Include all compiled plugins (below), or include individual files as needed --> 
+<script type="text/javascript" src="js/bootstrap.js"></script> 
+<script type="text/javascript" src="js/SmoothScroll.js"></script> 
+<script type="text/javascript" src="js/jquery.counterup.js"></script> 
+<script type="text/javascript" src="js/waypoints.js"></script> 
+<script type="text/javascript" src="js/jquery.prettyPhoto.js"></script> 
+<script type="text/javascript" src="js/jquery.isotope.js"></script> 
+<script type="text/javascript" src="js/jqBootstrapValidation.js"></script> 
+<script type="text/javascript" src="js/contact_me.js"></script> 
+
+<!-- Javascripts
+    ================================================== --> 
+<script type="text/javascript" src="js/main.js"></script>
+</body>
+</html>
