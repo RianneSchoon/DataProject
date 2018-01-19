@@ -1,242 +1,202 @@
-/* ----------------------------------------------------------------------------
-linked.js
-Source code to a webpage that shows two linked visualizations.
+/* ---------------------------------------------------------------------------
+project.js
+Source code to a webpage that shows supporting means of health care 
+and their influence on life expectancy around the world.
 
 Rianne Schoon, 10742794
 
 Sources and credits:
-- map: http://techslides.com/demos/d3/worldmap-template.html
-- scatterplot from week 4: https://bl.ocks.org/mbostock/3887118
----------------------------------------------------------------------------- */
+--------------------------------------------------------------------------- */
+
+// global variables: year selected by slider, threelettercodes countries
+var selectedYear, countryKeys;
 
 // load all datasets before display
 window.onload = function() {
   queue()
-    .defer(d3.json, "data/world-topo-min.json")
-    .defer(d3.json, "murderdata.json")
-    .defer(d3.json, "dataWeek4.json")
+    .defer(d3.json, "mapscatterjson.json")
+    .defer(d3.json, "linechartjson.json")
     .await(initAll);
-  };
+};
 
-  // data highlighting in scatterplot via clicking on map
-  function mapSelect (country) {
-    // undo previous selection -> all dots stroked with white again
-    d3.select("#scatter").selectAll(".dot").style("stroke", "white").style("opacity", ".3")
-    // currently selected class (country name without spaces) gets black stroke
-    d3.select("#scatter").select("." + country.replace(/\s/g, '')).style("stroke", "black").style("stroke-width", "2px").style("opacity", "1");
+// data highlighting in scatterplot via clicking on map
+function mapSelect (country) {
+  // undo previous selection -> all dots stroked with white again
+  d3.select("#scatter").selectAll(".dot")
+    .style("stroke", "white")
+    .style("opacity", ".3")
+  // currently selected class gets black stroke
+  d3.select("#scatter").select("." + country)
+    .style("stroke", "black")
+    .style("stroke-width", "2px")
+    .style("opacity", "1");
+};
 
-  };
-
-//  init function calls functions to draw map and scatterplot
-function initAll(error, world, murderings, happiness) {
+//  init function calls functions to draw map, scatterplot, linegraph
+function initAll(error, msdata, ldata) {
   if (error) console.log("Error with data");
 
-  // store country properties
-  var countries = topojson.feature(world, world.objects.countries).features;
+  // initialize map and scatterplot in 2000 on page load
+  var selectedYear = d3.select("#slider1").attr("value");
 
-  // draw map
-  drawWorldMap(countries, murderings);
+  // keys: years and countries
+  var yearKeys = Object.keys(msdata);
+  var countryKeys = Object.keys(msdata[selectedYear]);
 
-  // draw scatterplot
-  drawScatter(happiness);
-}
+  // variable keys same for all countries and years. GDP seperately.
+  var densityKeys = ["physicians", "nurses", "beds"];
+  var lifeKeys = ["LEP", "LEM", "LEF"];
 
-// draw the countries on the map
-function drawWorldMap (countries, murderRate) {
-  // map zoom functionality
-  d3.select(window).on("resize", throttle);
+  // draw visualizations (default year 2000)
+  drawWorldMap(msdata, selectedYear, countryKeys);
+  drawLineGraph(ldata, yearKeys, densityKeys, lifeKeys);
+  drawScatter(msdata, selectedYear, countryKeys);
+};
 
-  // map zoom functionality
-  var zoom = d3.behavior.zoom()
-      .scaleExtent([1, 9])
-      .on("zoom", move);
+// ---------------------------------------------------------------------------
+// DATAMAPS WORLD MAP
+// ---------------------------------------------------------------------------
 
-  // set height and width
-  var width = document.getElementById('container').offsetWidth,
-      height = width / 1.8;
+function drawWorldMap(msdata, selectedYear, countryKeys) {
 
-  // map variables
-  var topo, projection, path, svg, g;
+  // array to put fillkeys 
+  var countrycolor = {}
 
-  // map and scatterplot: enabling tooltip functionality
-  var tooltip = d3.select("#container").append("div").attr("class", "tooltip hidden");
+  // color buckets (0.001 to make countries without value grey)
+  var color = d3.scale.threshold()
+    .domain([0.001, 1, 2, 3, 4, 5, 6, 7.1])
+    .range(["gainsboro", "#d4f7ee", "#a8f0de", "#67e4c5", "#26d9ac", "#1fb28d", "#1b9878", "#136c56"])
 
-  // map dimensions setup
-  function setupMap (width,height) {
-    projection = d3.geo.mercator()
-      .translate([(width/2), (height/2)])
-      .scale( width / 2 / Math.PI);
+  // coloring based on data values for each country
+  countryKeys.forEach(function (key) {
+    countrycolor[key] = {
+      fillColor: color(msdata[selectedYear][key]["physicians"]),
+      physicians: msdata[selectedYear][key]["physicians"]
+    };
+  });
 
-    // to draw countries
-    path = d3.geo.path().projection(projection);
+  // get map div in html
+  var map = new Datamap({
+    element: document.getElementById('container0'),
 
-    // map can be zoomed and clicked everywhere
-    svg = d3.select("#container").append("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .call(zoom)
-        .append("g");
-    g = svg.append("g");
+    // usual projection (greenland enlarged, etc)
+    projection: 'mercator',
 
-    // draw countries on map
-    drawTopo(countries);
-  }
+    // countries colored based on data
+    // quantize scale -> naar kijken!! d3.scale.quantize
+    fills: {
+      defaultFill: "gainsboro"},
+    data: countrycolor,
 
-  // call the setup function so that the map can be drawn
-  setupMap(width,height);
+    // configurations
+    geographyConfig: {
+      borderColor: "#bfbfbf",
+      highlightFillColor: false,
+      highlightBorderColor: '#a6a6a6',
+      zoomOnClick: true,
+      popupOnHover: true,
 
-  // draw countries on map
-  function drawTopo(countries) {
+      // tooltip template - when data: show it; otherwise: just country name
+      popupTemplate: function(geo, data) {
+        if (data["physicians"]) {
+          return '<div class="hoverinfo"><strong>' + geo.properties.name + 
+              '</strong><br>' + "Physicians per 1000: " + '<strong>' 
+              + data.physicians + '</strong>'
+        }
+        else {
+          return '<div class="hoverinfo"><strong>' + geo.properties.name 
+              +'</strong><br>'
+        }
+      }
+    }
+  });
+  
+  map.svg.selectAll('datamaps-subunit')
+    .on('click', console.log("geo.properties.name"));
 
-    //  draw equator
-    g.append("path")
-     .datum({type: "LineString", coordinates: [[-180, 0], [-90, 0], [0, 0], [90, 0], [180, 0]]})
-     .attr("class", "equator")
-     .attr("d", path);
+  d3.select("#slider1").on("input", function () {
+    var selectedYear = +this.value;
+    countryKeys.forEach(function (key) {
+      countrycolor[key] = {
+        fillColor: color(msdata[selectedYear][key]["physicians"]),
+        physicians: msdata[selectedYear][key]["physicians"]
+      };
 
-    // each country has own g element
-    var country = g.selectAll(".country").data(countries);
+      // Color the map according to color buckets
+      map.updateChoropleth(countrycolor);
+    });
+  });
+  
+  // map dragging and zooming functionality
+  map.svg.call(d3.behavior.zoom()
+    .on("zoom", redraw));
 
-    // each country on g element on the map
-    country.enter().insert("path")
-        // class is country name
-        .attr("class", function(d, i) { return "country" + " " + d.properties.name; })
-        .attr("d", path)
-        .attr("id", function(d,i) { return d.id; })
-        .attr("title", function(d, i) { return d.properties.name; })
-        .on("click", function(d) { mapSelect(d.properties.name); })
-        // TO DO: fill color according to murderdata (chloropleth)
-        .style("fill", function(d, i) { return d.properties.color; });
+  // redraw map upon dragging/zooming
+  function redraw() {
+    map.svg.selectAll("g")
+      .attr("transform", "scale(" + d3.event.scale + ")" + "translate(" + d3.event.translate + ")");
+  };
+};
 
-    // offsets for tooltips
-    var offsetL = document.getElementById('container').offsetLeft + 20;
-    var offsetT = document.getElementById('container').offsetTop + 10;
+// ---------------------------------------------------------------------------
+// MULTI LINE GRAPH
+//  first version without map selection of country: line chart for Australia
+// ---------------------------------------------------------------------------
 
-    // tooltips appear when mouse is over country - and follow mouse movements
-    country
-      .on("mousemove", function(d, i) {
-
-        // mouse place on the map
-        var mouse = d3.mouse(svg.node()).map( function(d) { return parseInt(d); });
-
-        // tooltip is visible when mouse moves on country
-        tooltip.classed("hidden", false)
-          // tooltip placement
-          .attr("style", "left:" + (mouse[0] + offsetL) + "px;top:" + (mouse[1] + offsetT)+"px")
-          // .html(d.properties.name + murderRate[d.properties.name]);
-          .html("<strong>Country:</strong> <span style='color:midnightblue'>" + d.properties.name + "</span>" + "<br>" +
-            "<strong>Murders:</strong> <span style='color:midnightblue'>" + murderRate[d.properties.name] + "</span>");
-      })
-
-      // when mouse moves away, tooltip disappears
-      .on("mouseout",  function(d, i) {
-        tooltip.classed("hidden", true);
-      })
-  }
-
-  // when user changes map on page, redraw it
-  function redrawMap() {
-
-    console.log("redrawMap aangeroepen!");
-
-    width = document.getElementById('container').offsetWidth;
-    height = width / 2;
-    d3.select('svg').remove();
-    setupMap(width,height);
-    drawTopo(countries);
-  }
-
-  // update map scale when user zooms map
-  function move() {
-
-    // 
-    var t = d3.event.translate;
-    var s = d3.event.scale; 
-    zscale = s;
-    var h = height/4;
-
-    // 
-    t[0] = Math.min(
-      (width/height)  * (s - 1), 
-      Math.max( width * (1 - s), t[0] )
-    );
-
-    t[1] = Math.min(
-      h * (s - 1) + h * s, 
-      Math.max(height  * (1 - s) - h * s, t[1])
-    );
-
-    zoom.translate(t);
-    g.attr("transform", "translate(" + t + ")scale(" + s + ")");
-    d3.selectAll(".country").style("stroke-width", 1.5 / s);
-  }
-
-  // when map is moved, update
-  var throttleTimer = 0
-  function throttle() {
-      window.clearTimeout(throttleTimer);
-        throttleTimer = window.setTimeout(function() {
-          redrawMap();
-        }, 200);
-  }
-}
-
-// draw the scatterplot
-function drawScatter(happiness) {
+function drawLineGraph (ldata, yearKeys, densityKeys, lifeKeys) {
 
   // set height, width and margins
   var margin = {top: 100, right: 200, bottom: 20, left: 30},
-    width = 1000 - margin.left - margin.right,
-    height = 580 - margin.top - margin.bottom;
+    width = 750 - margin.left - margin.right,
+    height = 435 - margin.top - margin.bottom;
 
-  // scatterplot x-axis range
-  var x = d3.scale.linear()
-      .range([0, width]);
+  // axes ranges
+  var x = d3.time.scale().range([0, width]);
+  var y1 = d3.scale.linear().range([height, 0]);
+  var y2 = d3.scale.linear().range([height, 0]);
 
-  // scatterplot y-axis range
-  var y = d3.scale.linear()
-      .range([height, 0]);
+  // axes orientation
+  var xAxis = d3.svg.axis().scale(x).orient("bottom");
+  var y1Axis = d3.svg.axis().scale(y1).orient("left");
+  var y2Axis = d3.svg.axis().scale(y2).orient("right");
 
-  // enable scatterplot dots to be colored
+  // enable lines to be colored
   var color = d3.scale.category10();
 
-  // scatterplot x-axis orientation
-  var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient("bottom");
-
-  // scatterplot y-axis orientation
-  var yAxis = d3.svg.axis()
-      .scale(y)
-      .orient("left");
-
-  // append scatterplot svg to html body
-  var svg = d3.select("#scatter").append("svg")
-      .attr("id", "scatter_svg")
+  // append svg to html body
+  var svg = d3.select("#line").append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
     .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")"); 
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  // global: keep track of subselection of data in scatterplot
-  var clicked = 0;
-  var clickedData;
+  // append line to svg
+  var lineSvg = svg.append("g");
 
-  // convert data from string (as in json) to integer (for display purposes)
-  happiness.forEach(function(d) {
-    d.happyLifeYears = +d.happyLifeYears;
-    d.AvLifeExp = +d.AvLifeExp;
-    d.GDPCapita = +d.GDPCapita;
+  // arrays for d3 extent per axis
+  var densityArray = [], lifeArray = [];
+
+  // data type translations for axes division (date objects / integers)
+  yearKeys.forEach(function(year) {
+    yearKeys[year] = new Date(year);
   });
-
-  // scale dots based on data
-  var rscale = d3.scale.linear()
-  .domain(d3.extent(happiness, function(d) { return d.GDPCapita; })).nice()
-  .range([5,22]);
+  densityKeys.forEach(function(density) {
+    for (var i = 0; i < 44; i++) {
+      densityArray.push(+ldata["AUS"][density][i]);
+    }
+  });
+  lifeKeys.forEach(function(life) {
+    for (var j = 0; j < 44; j++) {
+      lifeArray.push(+ldata["AUS"][life][j]);
+    }
+  });
+  console.log(densityArray);
+  console.log(lifeArray);
 
   // set axes division
-  x.domain(d3.extent(happiness, function(d) { return d.happyLifeYears; })).nice();
-  y.domain(d3.extent(happiness, function(d) { return d.AvLifeExp; })).nice();
+  x.domain(d3.extent(yearKeys));
+  y1.domain(d3.extent(densityArray));
+  y2.domain(d3.extent(lifeArray));
 
   // create x-axis and title
   svg.append("g")
@@ -248,7 +208,183 @@ function drawScatter(happiness) {
       .attr("x", width)
       .attr("y", -6)
       .style("text-anchor", "end")
-      .text("Happy life years");
+      .text("Year");
+
+  // create y1-axis and title
+  svg.append("g")
+      .attr("class", "y1 axis")
+      .call(y1Axis)
+    .append("text")
+      .attr("class", "label")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Per 1000 of population");
+
+  // create y2-axis and title
+  svg.append("g")
+      .attr("class", "y2 axis")
+      .attr("transform", "translate(" + width + " ,0)")
+      .call(y2Axis)
+    .append("text")
+      .attr("class", "label")
+      .attr("transform", "rotate(-90)")
+      .attr("y", -13)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("GDP in moneyz");
+    
+  // create graph title
+  svg.append("g")
+      .attr("class", "title")
+    .append("text")
+      .attr("x", (width + margin.left + margin.right) * .09)
+      .attr("y", - margin.top / 1.7)
+      .attr("dx", ".71em")
+      .attr("font-size", "20px")
+      .style("text-anchor", "begin")
+      .text("Cool title for this multi-line graph yas"); 
+
+  // var focus = svg.append("g")
+  //     .style("display", "none");
+
+  // valuelines declarations
+  var densityLine = d3.svg.line()
+    .x(function(d) { console.log(d); return x(d) })
+    .y(function(d) { return y1(ldata["AUS"][d]) });
+  var lifeLine = d3.svg.line()
+    .x(function(d) { return x(d) })
+    .y(function(d) { return y1(ldata["AUS"][d]) });
+ 
+  // create right lines on svg for every variable
+  var densityLines = svg.selectAll(".densitylines")
+    .data(ldata["AUS"])
+    .enter().append("g")
+      .attr("class", "densitylines");
+  var lifeLines = svg.selectAll(".lifelines")
+    .data(lifeKeys)
+    .enter().append("g")
+      .attr("class", "lifelines")
+
+  // draw lines
+  densityLines.append("path")
+      .attr("class", "densityline")
+      .attr("stroke-linejoin", "round")
+      .attr("stroke-linecap", "round")
+      .attr("stroke-width", "1")
+      .attr("d", function(d) { return densityLine(ldata["AUS"][d]); })
+      .style("stroke", function(d) { return "gainsboro" });
+
+  lifeLines.append("path")
+      .attr("class", "lifeline")
+      .attr("stroke-linejoin", "round")
+      .attr("stroke-linecap", "round")
+      .attr("stroke-width", "1")
+      .attr("d", function(d) { return lifeLine(ldata["AUS"][d]); })
+      .style("stroke", function(d) { return "#1fb28d" });
+
+//  -------------------------------------------------------------------
+    // // cross-hair functionality: data to left of mouse
+    // var hairDate = d3.bisector(function(d) { return d.date; }).left;
+
+    // // append the circle at the intersection
+    // focus.append("circle")
+    //     .attr("class", "y")
+    //     .style("fill", "none")
+    //     .style("stroke", "blue")
+    //     .attr("r", 4);
+
+    // // append the rectangle to capture mouse
+    // svg.append("rect")
+    //     .attr("width", width)
+    //     .attr("height", height)
+    //     .style("fill", "none")
+    //     .style("pointer-events", "all")
+    //     .on("mouseover", function() { focus.style("display", null); })
+    //     .on("mouseout", function() { focus.style("display", "none"); })
+    //     .on("mousemove", mousemove);
+
+  //     // cross-hair funcitonality
+  //   function mousemove() {
+  //     var x0 = x.invert(d3.mouse(this)[0]),
+  //       i = hairDate(year, x0, 1),
+  //       d0 = year[i - 1],
+  //       d1 = year[i],
+  //       d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+
+  //     // mouse focus
+  //     focus.select("circle.y")
+  //       .attr("transform", "translate(" + x(d.year) + "," + y(d.year) + ")");
+  //   }
+  // }; 
+};
+
+// ---------------------------------------------------------------------------
+// SCATTERPLOT
+// ---------------------------------------------------------------------------
+
+// draw the scatterplot
+function drawScatter(msdata, selectedYear, countryKeys) {
+
+  // set height, width and margins
+  var margin = {top: 100, right: 200, bottom: 20, left: 30},
+    width = 750 - margin.left - margin.right,
+    height = 435 - margin.top - margin.bottom;
+
+  // scatterplot axes range
+  var x = d3.scale.linear().range([0, width]);
+  var y = d3.scale.linear().range([height, 0]);
+
+  // scatterplot axes orientation
+  var xAxis = d3.svg.axis().scale(x).orient("bottom");
+  var yAxis = d3.svg.axis().scale(y).orient("left");
+
+  // enable scatterplot dots to be colored
+  var color = d3.scale.category10();
+
+  // append scatterplot svg to html body
+  var svg = d3.select("#scatter").append("svg")
+      .attr("id", "scatter_svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")"); 
+
+  // global in scatterplot: keep track of subselection of data in scatterplot
+  var clicked = 0;
+  var clickedData;
+
+  // data arrays
+  var physiciansArray = [], lepArray = [], gdpArray = [];
+
+  // make values integers
+  countryKeys.forEach(function(key) {
+    physiciansArray.push(+msdata[selectedYear][key]["physicians"]);
+    lepArray.push(+msdata[selectedYear][key]["LEP"]);
+    gdpArray.push(+msdata[selectedYear][key]["GDP"]);
+  });
+
+  // scale dots based on GDP data
+  var rscale = d3.scale.linear()
+    .domain(d3.extent(gdpArray)).nice()
+    .range([3,20]);
+
+  // set axes division
+  x.domain(d3.extent(physiciansArray)).nice();
+  y.domain(d3.extent(lepArray)).nice();
+
+  // create x-axis and title
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+    .append("text")
+      .attr("class", "label")
+      .attr("x", width)
+      .attr("y", -6)
+      .style("text-anchor", "end")
+      .text("Physicians per 1000 people");
 
   // create y-axis and title
   svg.append("g")
@@ -260,7 +396,7 @@ function drawScatter(happiness) {
       .attr("y", 6)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("Average life expectancy (years)");
+      .text("Population life expectancy (years)");
   
   // create graph title
   svg.append("g")
@@ -271,36 +407,37 @@ function drawScatter(happiness) {
       .attr("dx", ".71em")
       .attr("font-size", "20px")
       .style("text-anchor", "begin")
-      .text("Happy life years and average life expectancy related to world region and Gross Domestic Product");  
+      .text("Relation between physician density and population life expectancy");  
 
   // create dots
   scatterDot = svg.selectAll(".dot")
-      .data(happiness)
+      .data(countryKeys)
     .enter().append("circle")
-      .attr("class", function(d) { return "dot " + d.Region.replace(/\s/g, '') + " " + d.Country.replace(/\s/g, ''); })
-      .attr("r", function(d) { return rscale(d.GDPCapita); })
-      .attr("cx", function(d) { return x(d.happyLifeYears); })
-      .attr("cy", function(d) { return y(d.AvLifeExp); })
-      .style("fill", function(d) { return color(d.Region); })
+      .attr("class", function(d) { return "dot " + d; })
+      .attr("r", function(d) { return rscale(+msdata[selectedYear][d]["GDP"]); })
+      .attr("cx", function(d) { return x(+msdata[selectedYear][d]["physicians"]); })
+      .attr("cy", function(d) { return y(+msdata[selectedYear][d]["LEP"]); })
+      .style("fill", function(d) { return color(+msdata[selectedYear][d]); })
 
-  // create legend
+  // create legend with data selection functionality on click
   var legend = svg.selectAll(".legend")
-      .data(color.domain())
+      .data(countryKeys)
     .enter().append("g")
       .attr("class", "legend")
       .attr("transform", function(d, i) { return "translate(" + (width + margin.right - 30) + "," + i * 25 + ")"; })
-      // legend data selection functionality
       .on('click', function(region) { return legendSelect(region); });
 
   // legend colored rectangles
   legend.append("rect")
-      .attr("class", function(d) { return "dot " + d.replace(/\s/g, ''); })
-      .attr("width", 18)
-      .attr("height", 18)
+      .data(countryKeys)
+      .attr("class", function(d) { return "dot " + d; })
+      .attr("width", 15)
+      .attr("height", 15)
       .style("fill", color);
 
   // legend text
   legend.append("text")
+      .data(countryKeys)
       .attr("x", -5)
       .attr("y", 8)
       .attr("dy", ".35em")
@@ -342,19 +479,17 @@ function drawScatter(happiness) {
 
   // tooltips appear when mouse is over country - and follow mouse movements
   scatterDot
+    .data(countryKeys)
     .on("mouseover", function(d, i) {
 
+      // tooltip visible centered on dot when mouse moves over dot
       var mouse = d3.mouse(svg.node()).map( function(d) { return parseInt(d); });
-      console.log(mouse)
-      // tooltip is visible when mouse moves on country
       tooltip_s.classed("hidden", false)
-        // tooltip placement
-        // .style("x", 20)
-        // .style("y", 20)
+        .style("x", 20)
+        .style("y", 20)
         .attr("style", "left:" + (mouse[0] + offsetL) + "px;top:" + (mouse[1] + offsetT)+"px")
-        // .html(d.properties.name + murderRate[d.properties.name]);
-        .html("<strong>Country:</strong> <span style='color:midnightblue'>" + d.Country + "</span>" + "<br>" +
-          "<strong>GDP:</strong> <span style='color:midnightblue'>" + d.GDPCapita + "</span>");
+        .html("<strong>Country:</strong> <span style='color:midnightblue'>" + d + "</span>" + "<br>" +
+          "<strong>GDP:</strong> <span style='color:midnightblue'>" + msdata[selectedYear][d]["GDP"] + "</span>");
     })
 
     // when mouse moves away, tooltip disappears

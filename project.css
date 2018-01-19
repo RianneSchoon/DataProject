@@ -40,9 +40,11 @@ Sources and credits:
   text-align: center;
 }
 
-#container {
-  margin:10px 10%;
-  border:2px solid royalblue;
+#container0 {
+  /*margin:10px 10%;*/
+  display: block;
+  margin: auto;
+  border:2px solid #1fb28d;
   border-radius: 5px;
   height:100%;
   overflow:hidden;
@@ -70,9 +72,17 @@ div.tooltip {
   stroke-width: 1px;
 }
 
+/* time slider */
+#slider1, .radio1 {
+  width: 47%;
+  display: block;
+  margin: auto;
+}
+
+
 /* font for axes and ticks */
 #scatter {
-  font: 10px tahoma;
+  font: 12x tahoma;
   text-align: center;
   color: black;
 }
@@ -81,7 +91,7 @@ div.tooltip {
 .axis path,
 .axis line {
   fill: none;
-  stroke: royalblue;
+  stroke: #1fb28d;
   stroke-width: 1.8px;
   shape-rendering: crispEdges;
 }
