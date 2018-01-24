@@ -10,22 +10,24 @@ Sources and credits:
 
 // global variables: year selected by slider, threelettercodes countries
 var selectedYear, countryKeys;
-// default country to avoid error with linechart
-var selectedCountry = "AUS";
 
 // load all datasets before display
 window.onload = function() {
+  
+  console.log(2)
   queue()
     .defer(d3.json, "mapscatterjson.json")
     .defer(d3.json, "linechartjson.json")
     .await(initAll);
 };
 
-// data highlighting: clicking on map makes strokes dot in scatterplot black
+// data highlighting in scatterplot via clicking on map
 function mapSelect (country) {
+  // undo previous selection -> all dots stroked with white again
   d3.select("#scatter").selectAll(".dot")
     .style("stroke", "white")
     .style("opacity", ".3")
+  // currently selected class gets black stroke
   d3.select("#scatter").select("." + country)
     .style("stroke", "black")
     .style("stroke-width", "2px")
@@ -35,37 +37,39 @@ function mapSelect (country) {
 //  init function calls functions to draw map, scatterplot, linegraph
 function initAll(error, msdata, ldata) {
   if (error) console.log("Error with data");
-
-  // get initial slider value (year 2000) and update label
+  c
+  // initialize map and scatterplot in 2000 on page load
   var selectedYear = d3.select("#slider1").attr("value");
+
+  // select variable with radiobuttons
+  // var selectedVar = d3.select("#radio").attr("value");
+  console.log(d3.selectAll(".radio"))
+  console.log("hoverinfo")
+  d3.selectAll(".radio").on("change", function() { console.log(this.value) });
+
+  // update text on year slider
   d3.select("#slider1-value").text(selectedYear);
 
-  // get initial radio value (variable physicians)
-  d3.selectAll(".radio").on("change", function() { 
-    selectedVar = d3.select(this).attr("value");
-  });
-
-  // keys: years, countrynames, variable keys (density / life)
+  // keys: years, countrynames, variable keys (density / life expectancy)
   var yearKeys = Object.keys(msdata);
   var countryKeys = Object.keys(msdata[selectedYear]);
   var densityKeys = ["physicians", "nurses", "beds"];
-  // var lifeKeys = ["LEP", "LEM", "LEF"];
-  var lifeKeys = ["LEP"];
+  var lifeKeys = ["LEP", "LEM", "LEF"];
 
   // draw visualizations (default year 2000)
-  drawWorldMap(msdata, selectedYear, countryKeys, ldata, selectedCountry, yearKeys, densityKeys, lifeKeys);
-  drawLineGraph(ldata, selectedCountry, yearKeys, densityKeys, lifeKeys);
+  drawWorldMap(msdata, selectedYear, countryKeys);
+  drawLineGraph(ldata, yearKeys, densityKeys, lifeKeys);
   drawScatter(msdata, selectedYear, countryKeys);
-
-  // but do not show line chart already -> first user must select country
-  d3.selectAll(".linechart").remove();
 };
 
 // ---------------------------------------------------------------------------
 // DATAMAPS WORLD MAP
 // ---------------------------------------------------------------------------
 
-function drawWorldMap(msdata, selectedYear, countryKeys, ldata, selectedCountry, yearKeys, densityKeys, lifeKeys) {
+function drawWorldMap(msdata, selectedYear, countryKeys) {
+
+  // LATER:
+  // coloring based on extent -> percentage corresponds to color keys
 
   // array to put fillkeys 
   var countrycolor = {}
@@ -116,26 +120,20 @@ function drawWorldMap(msdata, selectedYear, countryKeys, ldata, selectedCountry,
               +'</strong><br>'
         }
       }
+    },
+    // map clicking functionality jQuery
+    done: function(datamap) {
+      datamap.svg.selectAll('datamaps-subunit')
+        .on('mouseover', function (d) { console.log("poep") });
+        // uiteindelijk: function mapSelect(country)
     }
   });
   
-  // on click: update linechart according to country
-  map.svg.selectAll('.datamaps-subunit').on('click', function() {
-    selectedCountry = d3.select(this).attr("class").slice(-3);
-    if (selectedCountry in ldata) {
-      d3.selectAll(".linechart").remove();
-      drawLineGraph(ldata, selectedCountry, yearKeys, densityKeys, lifeKeys);
-      mapSelect(selectedCountry);
-    }
-    else {
-      d3.selectAll(".densitylines").remove();
-      d3.selectAll(".lifelines").remove();
-      d3.select("#scatter").selectAll(".dot").style("stroke", "white").style("opacity", ".3")
-    }
-   
-  });
-
-  // on sliderinput: update map colors, sliderlabel, scatterplot
+  // // on click: update linechart according to country
+  // map.svg.selectAll('.datamaps-subunit')
+  //   .on('click', function(d) {console.log(this)});
+  
+  // update map and slider label on imput
   d3.select("#slider1").on("input", function () {
     var selectedYear = +this.value;
     d3.select("#slider1-value").text(selectedYear);
@@ -144,10 +142,10 @@ function drawWorldMap(msdata, selectedYear, countryKeys, ldata, selectedCountry,
         fillColor: color(msdata[selectedYear][key]["physicians"]),
         physicians: msdata[selectedYear][key]["physicians"]
       };
+
+      // Color the map according to color buckets
       map.updateChoropleth(countrycolor);
     });
-    d3.selectAll("#scatter_svg").remove();
-    drawScatter(msdata, selectedYear, countryKeys);
   });
   
   // map dragging and zooming functionality
@@ -159,6 +157,9 @@ function drawWorldMap(msdata, selectedYear, countryKeys, ldata, selectedCountry,
     map.svg.selectAll("g")
       .attr("transform", "scale(" + d3.event.scale + ")" + "translate(" + d3.event.translate + ")");
   };
+
+  // gradient legend
+
 };
 
 // ---------------------------------------------------------------------------
@@ -166,7 +167,7 @@ function drawWorldMap(msdata, selectedYear, countryKeys, ldata, selectedCountry,
 //  first version without map selection of country: line chart for Australia
 // ---------------------------------------------------------------------------
 
-function drawLineGraph (ldata, selectedCountry, yearKeys, densityKeys, lifeKeys) {
+function drawLineGraph (ldata, yearKeys, densityKeys, lifeKeys) {
 
   // set height, width and margins
   var margin = {top: 100, right: 200, bottom: 20, left: 30},
@@ -187,8 +188,7 @@ function drawLineGraph (ldata, selectedCountry, yearKeys, densityKeys, lifeKeys)
   var color = d3.scale.category10();
 
   // append svg to html body
-  var svg = d3.selectAll("#line").append("svg")
-      .attr("class", "linechart")
+  var svg = d3.select("#line").append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
     .append("g")
@@ -206,13 +206,13 @@ function drawLineGraph (ldata, selectedCountry, yearKeys, densityKeys, lifeKeys)
   });
   densityKeys.forEach(function(density) {
     for (var i = 0; i < 44; i++) {
-      densityArray.push(+ldata[selectedCountry][density][i]);
+      densityArray.push(+ldata["AUS"][density][i]);
     }
   });
 
   lifeKeys.forEach(function(life) {
     for (var j = 0; j < 44; j++) {
-      lifeArray.push(+ldata[selectedCountry][life][j]);
+      lifeArray.push(+ldata["AUS"][life][j]);
     }
   });
 
@@ -256,7 +256,7 @@ function drawLineGraph (ldata, selectedCountry, yearKeys, densityKeys, lifeKeys)
       .attr("y", -13)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("Life expextancy in years (total population)");
+      .text("GDP in moneyz");
     
   // create graph title
   svg.append("g")
@@ -296,7 +296,7 @@ function drawLineGraph (ldata, selectedCountry, yearKeys, densityKeys, lifeKeys)
       .attr("stroke-linejoin", "round")
       .attr("stroke-linecap", "round")
       .attr("stroke-width", "1")
-      .attr("d", function(d) { return densityLine(ldata[selectedCountry][d]); })
+      .attr("d", function(d) { return densityLine(ldata["AUS"][d]); })
       .style("stroke", function(d) { return color(d) });
   lifeLines.append("path")
       .attr("class", "lifeline")
@@ -304,8 +304,54 @@ function drawLineGraph (ldata, selectedCountry, yearKeys, densityKeys, lifeKeys)
       .attr("stroke-linejoin", "round")
       .attr("stroke-linecap", "round")
       .attr("stroke-width", "1")
-      .attr("d", function(d) { return lifeLine(ldata[selectedCountry][d]); })
+      .attr("d", function(d) { return lifeLine(ldata["AUS"][d]); })
       .style("stroke", function(d) { return color(d) });
+
+  // // circles on data points
+  // densityLines.selectAll('circle')
+  //   .data(densityKeys)
+  //   .enter().append('circle')
+  //     .attr('class', 'circle')
+  //     .attr('cx', function(d, i) { return x(yearArray[i]); })
+  //     .attr('cy', function(d) { return y1(+d); })
+  //     .attr('r', 3);
+  
+  // // cross hair functionality
+  // var focus = svg.append("g")
+  //     .style("display", "none");
+
+  // // cross-hair functionality: data to left of mouse
+  // var hairDate = d3.bisector(function(yearArray, i) { return yearArray[i]; }).left;
+
+  // // append the circle at the intersection
+  // focus.append("circle")
+  //     .attr("class", "y")
+  //     .style("fill", "none")
+  //     .style("stroke", "blue")
+  //     .attr("r", 4);
+
+  // // append the rectangle to capture mouse
+  // svg.append("rect")
+  //     .attr("width", width)
+  //     .attr("height", height)
+  //     .style("fill", "none")
+  //     .style("pointer-events", "all")
+  //     .on("mouseover", function() { focus.style("display", null); })
+  //     .on("mouseout", function() { focus.style("display", "none"); })
+  //     .on("mousemove", mousemove);
+
+  //   // cross-hair funcitonality
+  // function mousemove() {
+  //   var x0 = x.invert(d3.mouse(this)[0]),
+  //     i = hairDate(yearArray, x0, 1),
+  //     d0 = yearArray[i - 1],
+  //     d1 = yearArray[i],
+  //     d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+  // }
+
+  // //   // mouse focus
+  // //   focus.select("circle.y")
+  // //     .attr("transform", "translate(" + x(yearArray) + "," + y(yearArray) + ")");
 
   // // create legend
   // var legend = svg.selectAll(".legend")
