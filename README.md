@@ -2,6 +2,8 @@
 
 Do you want to live forever? When asked, most people will answer affirmatively. Unfortunately though, even if we are not afflicted by accidents or crimes, we would still have to live to eternity through disease, infections, and eventually wear and tear due to old age. Nonetheless, we still try to prolong our lives as much as possible. The success of this endeavor varies greatly. Let us explore some possible supporting means and their influence on life expectancy across the world!
 
+https://rianneschoon.github.io/DataProject/
+
 ### Problem statement
 We can wonder whether reaching old age is an achievement of operational interventions by modern medicine, or something else. Maybe just receiving aid, as given by nurses or provided by a hospital, is important. Or, perhaps, having access to enough food and good housing is important, for which money is needed. Since this is not known by many people, this visualization offers a hand!
 
