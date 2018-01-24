@@ -38,12 +38,15 @@ function initAll(error, msdata, ldata) {
 
   // initialize map and scatterplot in 2000 on page load
   var selectedYear = d3.select("#slider1").attr("value");
+  // var selectedVar = d3.select("#radio").attr("value");
+  d3.select("#radio").on("input", function() { console.log(this.value) });
 
-  // keys: years and countries
+  // update text on year slider
+  d3.select("#slider1-value").text(selectedYear);
+
+  // keys: years, countrynames, variable keys (density / life)
   var yearKeys = Object.keys(msdata);
   var countryKeys = Object.keys(msdata[selectedYear]);
-
-  // variable keys same for all countries and years. GDP seperately.
   var densityKeys = ["physicians", "nurses", "beds"];
   var lifeKeys = ["LEP", "LEM", "LEF"];
 
@@ -108,14 +111,21 @@ function drawWorldMap(msdata, selectedYear, countryKeys) {
               +'</strong><br>'
         }
       }
+    },
+    done: function(datamap) {
+      datamap.svg.selectAll('datamaps-subunit')
+        .on('click', function (d) { console.log("poep") });
     }
   });
   
-  map.svg.selectAll('datamaps-subunit')
-    .on('click', console.log("geo.properties.name"));
-
+  // // on click: update linechart according to country
+  // map.svg.selectAll('.datamaps-subunit')
+  //   .on('click', function(d) {console.log(this)});
+  
+  // update map and slider label on imput
   d3.select("#slider1").on("input", function () {
     var selectedYear = +this.value;
+    d3.select("#slider1-value").text(selectedYear);
     countryKeys.forEach(function (key) {
       countrycolor[key] = {
         fillColor: color(msdata[selectedYear][key]["physicians"]),
@@ -174,27 +184,26 @@ function drawLineGraph (ldata, yearKeys, densityKeys, lifeKeys) {
   var lineSvg = svg.append("g");
 
   // arrays for d3 extent per axis
-  var densityArray = [], lifeArray = [];
+  var yearArray = [], densityArray = [], lifeArray = [];
 
   // data type translations for axes division (date objects / integers)
   yearKeys.forEach(function(year) {
-    yearKeys[year] = new Date(year);
+    yearArray.push(new Date(year));
   });
   densityKeys.forEach(function(density) {
     for (var i = 0; i < 44; i++) {
       densityArray.push(+ldata["AUS"][density][i]);
     }
   });
+
   lifeKeys.forEach(function(life) {
     for (var j = 0; j < 44; j++) {
       lifeArray.push(+ldata["AUS"][life][j]);
     }
   });
-  console.log(densityArray);
-  console.log(lifeArray);
 
   // set axes division
-  x.domain(d3.extent(yearKeys));
+  x.domain(d3.extent(yearArray));
   y1.domain(d3.extent(densityArray));
   y2.domain(d3.extent(lifeArray));
 
@@ -246,20 +255,19 @@ function drawLineGraph (ldata, yearKeys, densityKeys, lifeKeys) {
       .style("text-anchor", "begin")
       .text("Cool title for this multi-line graph yas"); 
 
-  // var focus = svg.append("g")
-  //     .style("display", "none");
-
   // valuelines declarations
   var densityLine = d3.svg.line()
-    .x(function(d) { console.log(d); return x(d) })
-    .y(function(d) { return y1(ldata["AUS"][d]) });
+    .defined(function(d) { return d; })
+    .x(function(d, i) { return x(yearArray[i]) })
+    .y(function(d) { return y1(+d) });
   var lifeLine = d3.svg.line()
-    .x(function(d) { return x(d) })
-    .y(function(d) { return y1(ldata["AUS"][d]) });
- 
+    .defined(function(d) { return d; })
+    .x(function(d, i) { return x(yearArray[i]) })
+    .y(function(d) { return y2(+d) });
+
   // create right lines on svg for every variable
   var densityLines = svg.selectAll(".densitylines")
-    .data(ldata["AUS"])
+    .data(densityKeys)
     .enter().append("g")
       .attr("class", "densitylines");
   var lifeLines = svg.selectAll(".lifelines")
@@ -270,54 +278,91 @@ function drawLineGraph (ldata, yearKeys, densityKeys, lifeKeys) {
   // draw lines
   densityLines.append("path")
       .attr("class", "densityline")
+      .attr("fill", "none")
       .attr("stroke-linejoin", "round")
       .attr("stroke-linecap", "round")
       .attr("stroke-width", "1")
       .attr("d", function(d) { return densityLine(ldata["AUS"][d]); })
-      .style("stroke", function(d) { return "gainsboro" });
-
+      .style("stroke", function(d) { return color(d) });
   lifeLines.append("path")
       .attr("class", "lifeline")
+      .attr("fill", "none")
       .attr("stroke-linejoin", "round")
       .attr("stroke-linecap", "round")
       .attr("stroke-width", "1")
       .attr("d", function(d) { return lifeLine(ldata["AUS"][d]); })
-      .style("stroke", function(d) { return "#1fb28d" });
+      .style("stroke", function(d) { return color(d) });
 
-//  -------------------------------------------------------------------
-    // // cross-hair functionality: data to left of mouse
-    // var hairDate = d3.bisector(function(d) { return d.date; }).left;
+  // // circles on data points
+  // densityLines.selectAll('circle')
+  //   .data(densityKeys)
+  //   .enter().append('circle')
+  //     .attr('class', 'circle')
+  //     .attr('cx', function(d, i) { return x(yearArray[i]); })
+  //     .attr('cy', function(d) { return y1(+d); })
+  //     .attr('r', 3);
+  
+  // // cross hair functionality
+  // var focus = svg.append("g")
+  //     .style("display", "none");
 
-    // // append the circle at the intersection
-    // focus.append("circle")
-    //     .attr("class", "y")
-    //     .style("fill", "none")
-    //     .style("stroke", "blue")
-    //     .attr("r", 4);
+  // // cross-hair functionality: data to left of mouse
+  // var hairDate = d3.bisector(function(yearArray, i) { return yearArray[i]; }).left;
 
-    // // append the rectangle to capture mouse
-    // svg.append("rect")
-    //     .attr("width", width)
-    //     .attr("height", height)
-    //     .style("fill", "none")
-    //     .style("pointer-events", "all")
-    //     .on("mouseover", function() { focus.style("display", null); })
-    //     .on("mouseout", function() { focus.style("display", "none"); })
-    //     .on("mousemove", mousemove);
+  // // append the circle at the intersection
+  // focus.append("circle")
+  //     .attr("class", "y")
+  //     .style("fill", "none")
+  //     .style("stroke", "blue")
+  //     .attr("r", 4);
 
-  //     // cross-hair funcitonality
-  //   function mousemove() {
-  //     var x0 = x.invert(d3.mouse(this)[0]),
-  //       i = hairDate(year, x0, 1),
-  //       d0 = year[i - 1],
-  //       d1 = year[i],
-  //       d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+  // // append the rectangle to capture mouse
+  // svg.append("rect")
+  //     .attr("width", width)
+  //     .attr("height", height)
+  //     .style("fill", "none")
+  //     .style("pointer-events", "all")
+  //     .on("mouseover", function() { focus.style("display", null); })
+  //     .on("mouseout", function() { focus.style("display", "none"); })
+  //     .on("mousemove", mousemove);
 
-  //     // mouse focus
-  //     focus.select("circle.y")
-  //       .attr("transform", "translate(" + x(d.year) + "," + y(d.year) + ")");
-  //   }
-  // }; 
+  //   // cross-hair funcitonality
+  // function mousemove() {
+  //   var x0 = x.invert(d3.mouse(this)[0]),
+  //     i = hairDate(yearArray, x0, 1),
+  //     d0 = yearArray[i - 1],
+  //     d1 = yearArray[i],
+  //     d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+  // }
+
+  // //   // mouse focus
+  // //   focus.select("circle.y")
+  // //     .attr("transform", "translate(" + x(yearArray) + "," + y(yearArray) + ")");
+
+  // // create legend
+  // var legend = svg.selectAll(".legend")
+  //     .data(color.domain())
+  //   .enter().append("g")
+  //     .attr("class", "legend")
+  //     .attr("transform", function(d, i) { return "translate(" + (width + margin.right - 30) + "," + i * 25 + ")"; })
+
+  //     // legend data selection functionality
+  //     .on('click', function(region) { return selectData(region); })
+
+  // // legend colored rectangles
+  // legend.append("rect")
+  //     .attr("class", function(d) { return "dot " + d.replace(/\s/g, ''); })
+  //     .attr("width", 18)
+  //     .attr("height", 18)
+  //     .style("fill", color);
+
+  // // legend text
+  // legend.append("text")
+  //     .attr("x", -5)
+  //     .attr("y", 8)
+  //     .attr("dy", ".35em")
+  //     .style("text-anchor", "end")
+  //     .text(function (d) { return d; });
 };
 
 // ---------------------------------------------------------------------------
@@ -341,7 +386,7 @@ function drawScatter(msdata, selectedYear, countryKeys) {
   var yAxis = d3.svg.axis().scale(y).orient("left");
 
   // enable scatterplot dots to be colored
-  var color = d3.scale.category10();
+  var color = d3.scale.category20();
 
   // append scatterplot svg to html body
   var svg = d3.select("#scatter").append("svg")
@@ -417,31 +462,33 @@ function drawScatter(msdata, selectedYear, countryKeys) {
       .attr("r", function(d) { return rscale(+msdata[selectedYear][d]["GDP"]); })
       .attr("cx", function(d) { return x(+msdata[selectedYear][d]["physicians"]); })
       .attr("cy", function(d) { return y(+msdata[selectedYear][d]["LEP"]); })
-      .style("fill", function(d) { return color(+msdata[selectedYear][d]); })
+      .style("fill", color);
+      // .style("fill", function(d) { return color(+msdata[selectedYear][d]); })
 
   // create legend with data selection functionality on click
   var legend = svg.selectAll(".legend")
       .data(countryKeys)
     .enter().append("g")
       .attr("class", "legend")
-      .attr("transform", function(d, i) { return "translate(" + (width + margin.right - 30) + "," + i * 25 + ")"; })
+      .attr("transform", function(d, i) { return "translate(" + (width + margin.right - 30) + "," + i * 7 + ")"; })
       .on('click', function(region) { return legendSelect(region); });
 
   // legend colored rectangles
   legend.append("rect")
       .data(countryKeys)
       .attr("class", function(d) { return "dot " + d; })
-      .attr("width", 15)
-      .attr("height", 15)
+      .attr("width", 6)
+      .attr("height", 6)
       .style("fill", color);
 
   // legend text
   legend.append("text")
       .data(countryKeys)
       .attr("x", -5)
-      .attr("y", 8)
+      .attr("y", 3)
       .attr("dy", ".35em")
       .style("text-anchor", "end")
+      .style("font-size", "6px")
       .text(function (d) { return d; });
 
   // enable data selection in scatterplot via the legend

@@ -44,7 +44,7 @@ Sources and credits:
   /*margin:10px 10%;*/
   display: block;
   margin: auto;
-  border:2px solid #1fb28d;
+  border:2px solid #0dad8d;
   border-radius: 5px;
   height:100%;
   overflow:hidden;
@@ -74,7 +74,7 @@ div.tooltip {
 
 /* time slider */
 #slider1, .radio1 {
-  width: 47%;
+  width: 50%;
   display: block;
   margin: auto;
 }
@@ -91,7 +91,7 @@ div.tooltip {
 .axis path,
 .axis line {
   fill: none;
-  stroke: #1fb28d;
+  stroke: #0dad8d;
   stroke-width: 1.8px;
   shape-rendering: crispEdges;
 }
@@ -113,4 +113,24 @@ div.tooltip {
 
 #works-section {
     padding: 0px;
+}
+
+.radiobuttons input[type="radio"], .radio-inline input[type="radio"], .checkbox input[type="checkbox"], .checkbox-inline input[type="checkbox"] {
+    position: center;
+    margin-top: 4px \9;
+    margin-left: 10px;
+}
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #555;
+  background-color: #fff;
+
+label {
+  font-size: 12px;
+  font-weight: 400;
+  font-family: 'Open Sans', sans-serif;
+  float: right;
 }
