@@ -20,7 +20,7 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
-  <script src="//datamaps.github.io/scripts/0.4.4/datamaps.world.min.js"></script>
+  <script src="//datamaps.github.io/scripts/0.5.0/datamaps.world.hires.min.js"></script>
   <script src="//d3js.org/queue.v1.min.js"></script>
   <script src="js/drawWorldMap.js" charset="utf-8"></script>
   <script src="js/drawLineGraph.js" charset="utf-8"></script>
@@ -39,6 +39,18 @@
       <ul class="nav navbar-nav navbar-right">
         <li><a href="#home" class="page-scroll">Home</a></li>
         <li><a href="#services-section" class="page-scroll">Intro</a></li>
+          <!-- <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal"></button>
+              <h4 class="modal-title">Basic Bootstrap Modal</h4>
+            </div>
+            <div class="modal-body">
+              <p>The Bootstrap Modal is a lightweight multi-purpose JavaScript popup that is customizable and responsive.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div> -->
         <li><a href="#works-section" class="page-scroll">World map</a></li>
         <li><a href="#about-section" class="page-scroll">Line/scattergraphs</a></li>
         <!-- <li><a href="#works-section" class="page-scroll">Scatterplot</a></li> -->
@@ -75,8 +87,8 @@
     <div class="row">
       <div class="col-sm-6">
         <div class="section-title text-center center">
-          <h2>World map: Hover / click countries</h2>
-          <div class="chart" id="container0" style="position: relative; width: 750px; height: 450px;"> 
+          <h2>World map: <span id="maptitle-value">...</span></h2>
+          <div class="chart" id="container0" style="position: relative; width: 750px; height: 400px;"> 
           </div>
         </div>
       </div>
@@ -103,12 +115,12 @@
           <h2>Please select health care variable</h2>
         </div>
         <div>
-          <form>
-            <input class="radio" type="radio" name="chooseone" value="LEP"><label for="LEP">Life expectancy (years)</label>
-            <input class="radio" type="radio" name="chooseone" value="physicians" checked><label for="physicians">Physicians per 1000 of population</label>
-            <input class="radio" type="radio" name="chooseone" value="nurses"><label for="nurses">Nurses per 1000 of population</label>
-            <input class="radio" type="radio" name="chooseone" value="beds"><label for="beds">Hospital beds per 1000 of population</label>
-            <input class="radio" type="radio" name="chooseone" value="GDP"><label for="GDP">Gross Domestic Product (USD)</label>
+          <form align="center">
+            <input align="center" class="radioform" type="radio" name="chooseone" value="LEP">Life expectancy (years)</br>
+            <input align="center" class="radioform" type="radio" name="chooseone" value="physicians" checked>Physicians per 1000 of population<br>
+            <input align="center" class="radioform" type="radio" name="chooseone" value="nurses">Nurses per 1000 of population<br>
+            <input align="center" class="radio" type="radio" name="chooseone" value="beds">Hospital beds per 1000 of population<br>
+            <input align="center" class="radioform" type="radio" name="chooseone" value="GDP">Gross Domestic Product (USD)<br>
           </form>
         </div>
       </div>
@@ -123,6 +135,7 @@
       <div class="col-sm-6">
         <!-- <div class="container"> -->
         <div class="section-title text-center center">
+          <h2>Density (y1) and <span id="lineTitleY2-value">...</span> (y2)</h2>
           <div class="chart" id="line"></div>
         </div>
       </div>
@@ -130,6 +143,7 @@
       <div class="container-fluid">
         <div class="col-sm-6">
           <div class="section-title text-center center">
+            <h2><span id="scatterTitleX-value">...</span> vs. <span id="scatterTitleY-value">...</span></h2>
             <div class="chart" id="scatter"></div>
           </div>
         </div>

@@ -5,12 +5,24 @@ Function that draws a scatterplot with clickable legend.
 Rianne Schoon, 10742794
 --------------------------------------------------------------------------- */
 
-function drawScatter(msdata, selectedYear, countryKeys) {
+function drawScatter(msdata, selectedYear, selectedVar, countryKeys, test) {
+  console.log(countryKeys);
+  console.log(selectedVar);
 
-  // set height, width and margins
-  var margin = {top: 100, right: 200, bottom: 20, left: 30},
+  // if (selectedVar == "physicians" || scatX == "nurses" || scatX == "beds") {
+  //   scatY.push("LEM");
+  //   scatY.push("LEF");
+  //   scatDotSize.push["GDP"]
+  // }
+  // else if (selectedVar == "GDP") {
+  //   scatY.push("LEM");
+  //   scatY.push("LEF");
+  //   scatDotSize.push["GDP"] 
+  // }
+
+  var margin = {top: 10, right: 130, bottom: 20, left: 30},
     width = 750 - margin.left - margin.right,
-    height = 435 - margin.top - margin.bottom;
+    height = 325 - margin.top - margin.bottom;
 
   // scatterplot axes range
   var x = d3.scale.linear().range([0, width]);
@@ -25,7 +37,7 @@ function drawScatter(msdata, selectedYear, countryKeys) {
 
   // append scatterplot svg to html body
   var svg = d3.select("#scatter").append("svg")
-      .attr("id", "scatter_svg")
+      .attr("class", "scatterchart")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
     .append("g")
@@ -36,23 +48,25 @@ function drawScatter(msdata, selectedYear, countryKeys) {
   var clickedData;
 
   // data arrays
-  var physiciansArray = [], lepArray = [], gdpArray = [];
+  var scatXArray = [], scatYArray = [], scatDotSizeArray = [];
 
   // make values integers
   countryKeys.forEach(function(key) {
-    physiciansArray.push(+msdata[selectedYear][key]["physicians"]);
-    lepArray.push(+msdata[selectedYear][key]["LEP"]);
-    gdpArray.push(+msdata[selectedYear][key]["GDP"]);
+    scatXArray.push(+msdata[selectedYear][key][scatXVar]);
+    scatYVar.forEach(function(Yvar) {
+      scatYArray.push(+msdata[selectedYear][key][Yvar]);
+    });
+    scatDotSizeArray.push(+msdata[selectedYear][key][scatDotSize]);
   });
 
   // scale dots based on GDP data
   var rscale = d3.scale.linear()
-    .domain(d3.extent(gdpArray)).nice()
+    .domain(d3.extent(scatDotSizeArray)).nice()
     .range([3,20]);
 
   // set axes division
-  x.domain(d3.extent(physiciansArray)).nice();
-  y.domain(d3.extent(lepArray)).nice();
+  x.domain(d3.extent(scatXArray)).nice();
+  y.domain(d3.extent(scatYArray)).nice();
 
   // create x-axis and title
   svg.append("g")
@@ -78,25 +92,25 @@ function drawScatter(msdata, selectedYear, countryKeys) {
       .style("text-anchor", "end")
       .text("Population life expectancy (years)");
   
-  // create graph title
-  svg.append("g")
-      .attr("class", "title")
-    .append("text")
-      .attr("x", (width + margin.left + margin.right) * .032)
-      .attr("y", - margin.top / 1.7)
-      .attr("dx", ".71em")
-      .attr("font-size", "20px")
-      .style("text-anchor", "begin")
-      .text("Relation between physician density and population life expectancy");  
+  // // create graph title
+  // svg.append("g")
+  //     .attr("class", "title")
+  //   .append("text")
+  //     .attr("x", (width + margin.left + margin.right) * .032)
+  //     .attr("y", - margin.top / 1.7)
+  //     .attr("dx", ".71em")
+  //     .attr("font-size", "20px")
+  //     .style("text-anchor", "begin")
+  //     .text("Relation between physician density and population life expectancy");  
 
   // create dots
   scatterDot = svg.selectAll(".dot")
       .data(countryKeys)
     .enter().append("circle")
       .attr("class", function(d) { return "dot " + d; })
-      .attr("r", function(d) { return rscale(+msdata[selectedYear][d]["GDP"]); })
-      .attr("cx", function(d) { return x(+msdata[selectedYear][d]["physicians"]); })
-      .attr("cy", function(d) { return y(+msdata[selectedYear][d]["LEP"]); })
+      .attr("r", function(d) { return rscale(+msdata[selectedYear][d][scatDotSize]); })
+      .attr("cx", function(d) { return x(+msdata[selectedYear][d][scatXVar]); })
+      .attr("cy", function(d) { return y(+msdata[selectedYear][d][scatYVar]); })
       .style("fill", color);
       // .style("fill", function(d) { return color(+msdata[selectedYear][d]); })
 
@@ -105,7 +119,7 @@ function drawScatter(msdata, selectedYear, countryKeys) {
       .data(countryKeys)
     .enter().append("g")
       .attr("class", "legend")
-      .attr("transform", function(d, i) { return "translate(" + (width + margin.right - 30) + "," + i * 7 + ")"; })
+      .attr("transform", function(d, i) { return "translate(" + (width + margin.right - 70) + "," + i * 7 + ")"; })
       .on('click', function(region) { return legendSelect(region); });
 
   // legend colored rectangles
@@ -127,7 +141,7 @@ function drawScatter(msdata, selectedYear, countryKeys) {
       .text(function (d) { return d; });
 
   // enable data selection in scatterplot via the legend
-  
+
   function legendSelect (region) {
     // if no subset of data has been clicked yet: clicked subset of data pops out
     if (clicked == 0) {

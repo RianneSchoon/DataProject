@@ -14,12 +14,18 @@ window.onload = function() {
     .await(initAll);
 };
 
-// global variables
+// default values for initial page load
 var selectedYear = "2000";
 var selectedVar = "physicians"
 var selectedCountry = "AUS";
-var densityKeys = ["physicians", "nurses", "beds"];
-// var lifeKeys = ["LEP", "LEM", "LEF"];
+// variables for linechart axes
+var y1Keys = ["physicians", "nurses", "beds"]; // var lifeKeys = ["LEP", "LEM", "LEF"];
+var y2Key = ["LEP"];
+// variables for scatterplot axes and dotsize
+var scatXVar = [selectedVar];
+var scatYVar = ["LEM"];
+var scatDotSize = ["GDP"];
+// further globals
 var lifeKeys = ["LEP"];
 var countryKeys, yearKeys, msdata, ldata;
 
@@ -36,18 +42,21 @@ function initAll(error, msdata, ldata) {
   highlight line of variable selected in radiobuttons
   --------------------------------------------------------------------------- */
   function lineSelect(selectedVar) {
-    console.log("lineselect");
 
     // all lines low opacity
-    d3.select("#line").selectAll(".lifeline")
+    d3.select("#line").selectAll(".y1line")
       .style("opacity", ".3")
       .style("stroke-width", "2px");
-    d3.select("#line").selectAll(".densityline")
+    d3.select("#line").selectAll(".y2line")
       .style("opacity", ".3")
       .style("stroke-width", "2px");
 
     // only selected lines high opacity, according to variable
-    if (selectedVar == "physicians") {
+    if (selectedVar == "LEP") {
+      d3.select("#line").selectAll(".LEP")
+      .style("opacity", "1")
+      .style("stroke-width", "3px"); }
+    else if (selectedVar == "physicians") {
       d3.select("#line").selectAll(".physicians")
       .style("opacity", "1")
       .style("stroke-width", "3px"); }
@@ -59,101 +68,89 @@ function initAll(error, msdata, ldata) {
       d3.select("#line").selectAll(".beds")
       .style("opacity", "1")
       .style("stroke-width", "3px"); }
-    else if (selectedVar == "LEP") {
-      d3.select("#line").selectAll(".LEP")
+    else if (selectedVar == "GDP") {
+      d3.select("#line").selectAll(".GDP")
       .style("opacity", "1")
       .style("stroke-width", "3px"); }
   };
 
-  // /* ---------------------------------------------------------------------------
-  // function calcColDomain(selectedVar): 
-  // determine map coloring domain
-  // --------------------------------------------------------------------------- */
-  // function calcColDomain(selectedVar, yearKeys, countryKeys) {
 
-  //   // empty arrays to fill according to data
-  //   countrycolor = {};
-  //   varValues = [];
-  //   colDomain = [];
+  // set initial graph titles
+  d3.select("#maptitle-value").text(selectedVar);
+  d3.select("#lineTitleY2-value").text(y2Key);
+  d3.select("#scatterTitleX-value").text(scatXVar);
+  d3.select("#scatterTitleY-value").text(scatYVar);
 
-  //   // get data for the selected country and variable in array
-  //   yearKeys.forEach(function(year) {
-  //     countryKeys.forEach(function(land) {
-  //       varValues.push(+msdata[year][land][selectedVar]);
-  //     });
-  //   });
-
-  //   // determine coloring domain scale (7 color shades according to data maximum)
-  //   var varStep = d3.max(varValues) / 7;
-
-  //   // countries with missing data ('null' values) must retain gainsboro gray color
-  //   var coloring = 0.0001;
-
-  //   // fill domain array
-  //   for (var i = 0; i < 8; i++) {
-  //     colDomain.push(coloring);
-  //     coloring += varStep;
-  //   };
-
-  //   // return coloring domain according to data
-  //   return colDomain;
-  // };
-
-  //  ---------------------------------------------------------------------------
-  // function calcColRange(selectedVar): 
-  // determine map coloring range
-  // --------------------------------------------------------------------------- 
-  // function calcColRange(selectedVar) {
-
-  //   var colrange;
-  //   // physicians green, nurses red, beds blue, LEP orange, GDP purple
-  //   if (selectedVar == "physicians") {
-  //     colRange = ["gainsboro", "#d7f4d7", "#afe9af", "#87de87", "#5fd35f", "#37c837", "#2ca02c", "#217821"];
-  //   }
-  //   if (selectedVar == "nurses") {
-  //     colRange = ["gainsboro", "#f7d4d4", "#efa9a9", "#e77e7e", "#df5353", "#d62728", "#ac2020", "#811818"];
-  //   }
-  //   if (selectedVar == "beds") {
-  //     colRange = ["gainsboro", "#d3e9f8", "#a8d2f0", "#7cbce9", "#51a5e1", "#258fda", "#1e72ae", "#165683"];
-  //   }
-  //   if (selectedVar == "LEP") {
-  //     colRange = ["gainsboro", "#ffe4cc", "#ffc999", "#ffad66", "#ff9233", "#ff7700", "#cc5f00", "#994700"];
-  //   }
-  //   if (selectedVar == "GDP") {
-  //   colRange = ["gainsboro", "#e6dcef", "#cdb8e0", "#b395d0", "#9a71c1", "#814eb1", "#673e8e", "#4d2f6a"];
-  //   };
-  //   return colRange;
-  // };
-
-  // get initial slider value (year 2000) and update label
+  // get initial slider value (year 2000) and update slider label
   var selectedYear = d3.select("#slider1").attr("value");
   d3.select("#slider1-value").text(selectedYear);
 
   // keys: years, countrynames, variable keys (density / life)
   var yearKeys = Object.keys(msdata);
-  console.log(msdata[selectedYear]);
   var countryKeys = Object.keys(msdata[selectedYear]);
 
-  // // determine map coloring domain and range
-  // var colorDomain = calcColDomain(selectedVar, yearKeys, countryKeys);
-  // var colorRange = calcColRange(selectedVar);
-
-
-
-  // get radio value on change to update map
+  // Listen for radio button change and register value
   d3.selectAll(".radio").on("change", function() {
     selectedVar = d3.select(this).attr("value");
+
+    // update map title and colors to selected variables
+    d3.select("#maptitle-value").text(selectedVar);
     d3.select(".datamap").remove();
-    drawWorldMap(msdata, selectedYear, selectedVar, countryKeys, ldata, selectedCountry, yearKeys, densityKeys, lifeKeys);
-    lineSelect(selectedVar);
+    drawWorldMap(msdata, selectedYear, selectedVar, countryKeys, ldata, selectedCountry, yearKeys, y1Keys, lifeKeys);
+
+    // update linechart, scatterplot, title
+    if (selectedVar == "GDP" || selectedVar == "LEP") {
+
+      // linechart: update title with x-axis data
+      d3.select("#lineTitleY2-value").text(selectedVar);
+
+      // linechart: update axes and line highlighting
+      if (y2Key[0] == selectedVar) {
+        d3.select(".linechart").remove();
+        drawLineGraph(ldata, y2Key, selectedCountry, selectedVar, yearKeys, y1Keys, lifeKeys);
+      }
+      else if (y2Key[0] != selectedVar) {
+        d3.select(".linechart").remove();
+        y2Key[0] = selectedVar;
+        drawLineGraph(ldata, y2Key, selectedCountry, selectedVar, yearKeys, y1Keys, lifeKeys);
+      };
+
+      // scatterplot: update plot
+      if (selectedVar == "LEP") {
+        scatXVar = ["physicians"]; scatYVar = ["LEP"]; scatDotSize = ["GDP"];
+        d3.select("#scatterTitleX-value").text(scatXVar);
+        d3.select("#scatterTitleY-value").text(scatYVar);
+        d3.select(".scatterchart").remove();
+        drawScatter(msdata, selectedYear, selectedVar, countryKeys);
+      }
+      else if (selectedVar == "GDP") {
+        scatXVar = ["physicians"]; scatYVar = ["GDP"]; scatDotSize = ["LEP"];
+        d3.select("#scatterTitleX-value").text(scatXVar);
+        d3.select("#scatterTitleY-value").text(scatYVar);
+        d3.select(".scatterchart").remove();
+        drawScatter(msdata, selectedYear, selectedVar, countryKeys);
+      };
+    }
+    else if (selectedVar == "physicians" || selectedVar == "nurses" || selectedVar == "beds") {
+      
+      // linechart: update axes and line highlighting
+      d3.select(".linechart").remove();
+      drawLineGraph(ldata, y2Key, selectedCountry, selectedVar, yearKeys, y1Keys, lifeKeys);
+      
+      // scatterplot: update title and chart
+      scatXVar = [selectedVar]; scatYVar = ["LEP"]; scatDotSize = ["GDP"];
+      d3.select("#scatterTitleX-value").text(scatXVar);
+      d3.select("#scatterTitleY-value").text(scatYVar);
+      d3.select(".scatterchart").remove();
+      drawScatter(msdata, selectedYear, selectedVar, countryKeys)
+    };
   });
 
-
   // draw visualizations (default year 2000)
-  drawWorldMap(msdata, selectedYear, selectedVar, countryKeys, ldata, selectedCountry, yearKeys, densityKeys, lifeKeys);
-  drawLineGraph(ldata, selectedCountry, yearKeys, densityKeys, lifeKeys);
-  drawScatter(msdata, selectedYear, countryKeys);
+  drawWorldMap(msdata, selectedYear, selectedVar, countryKeys, ldata, selectedCountry, yearKeys, y1Keys, lifeKeys);
+  drawLineGraph(ldata, y2Key, selectedCountry, selectedVar, yearKeys, y1Keys, lifeKeys);
+  drawScatter(msdata, selectedYear, selectedVar, countryKeys);
 
   // but do not show line chart already -> first user must select country
-  d3.selectAll(".linechart").remove();
+  // d3.selectAll(".linechart").remove();
 };

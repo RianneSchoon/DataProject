@@ -5,12 +5,49 @@ Function that draws a multi line graph with two y-axes.
 Rianne Schoon, 10742794
 --------------------------------------------------------------------------- */
 
-function drawLineGraph (ldata, selectedCountry, yearKeys, densityKeys, lifeKeys) {
+function drawLineGraph (ldata, y2Key, selectedCountry, selectedVar, yearKeys, y1Keys, lifeKeys) {
+
+  /* ---------------------------------------------------------------------------
+  function lineSelect(selectedVar): 
+  highlight line of variable selected in radiobuttons
+  --------------------------------------------------------------------------- */
+  function lineSelect(selectedVar) {
+
+    // all lines low opacity
+    d3.select("#line").selectAll(".y1line")
+      .style("opacity", ".3")
+      .style("stroke-width", "2px");
+    d3.select("#line").selectAll(".y2line")
+      .style("opacity", ".3")
+      .style("stroke-width", "2px");
+
+    // only selected lines high opacity, according to variable
+    if (selectedVar == "LEP") {
+      d3.select("#line").selectAll(".LEP")
+      .style("opacity", "1")
+      .style("stroke-width", "3px"); }
+    else if (selectedVar == "physicians") {
+      d3.select("#line").selectAll(".physicians")
+      .style("opacity", "1")
+      .style("stroke-width", "3px"); }
+    else if (selectedVar == "nurses") {
+      d3.select("#line").selectAll(".nurses")
+      .style("opacity", "1")
+      .style("stroke-width", "3px"); }
+    else if (selectedVar == "beds") {
+      d3.select("#line").selectAll(".beds")
+      .style("opacity", "1")
+      .style("stroke-width", "3px"); }
+    else if (selectedVar == "GDP") {
+      d3.select("#line").selectAll(".GDP")
+      .style("opacity", "1")
+      .style("stroke-width", "3px"); }
+  };
 
   // set height, width and margins
-  var margin = {top: 100, right: 200, bottom: 20, left: 30},
+  var margin = {top: 10, right: 130, bottom: 20, left: 30},
     width = 750 - margin.left - margin.right,
-    height = 435 - margin.top - margin.bottom;
+    height = 325 - margin.top - margin.bottom;
 
   // axes ranges
   var x = d3.time.scale().range([0, width]);
@@ -37,27 +74,25 @@ function drawLineGraph (ldata, selectedCountry, yearKeys, densityKeys, lifeKeys)
   var lineSvg = svg.append("g");
 
   // arrays for d3 extent per axis
-  var yearArray = [], densityArray = [], lifeArray = [];
+  var xArray = [], y1Array = [], y2Array = [];
 
   // data type translations for axes division (date objects / integers)
   yearKeys.forEach(function(year) {
-    yearArray.push(new Date(year));
+    xArray.push(new Date(year));
   });
-  densityKeys.forEach(function(density) {
-    for (var i = 0; i < yearArray.length; i++) {
-      densityArray.push(+ldata[selectedCountry][density][i]);
+  y1Keys.forEach(function(density) {
+    for (var i = 0; i < xArray.length; i++) {
+      y1Array.push(+ldata[selectedCountry][density][i]);
     }
   });
-  lifeKeys.forEach(function(life) {
-    for (var j = 0; j < yearArray.length; j++) {
-      lifeArray.push(+ldata[selectedCountry][life][j]);
-    }
-  });
+  for (var j = 0; j < xArray.length; j++) {
+    y2Array.push(+ldata[selectedCountry][y2Key][j]);
+  }
 
   // set axes division
-  x.domain(d3.extent(yearArray));
-  y1.domain(d3.extent(densityArray));
-  y2.domain(d3.extent(lifeArray));
+  x.domain(d3.extent(xArray));
+  y1.domain(d3.extent(y1Array));
+  y2.domain(d3.extent(y2Array))
 
   // create x-axis and title
   svg.append("g")
@@ -83,67 +118,96 @@ function drawLineGraph (ldata, selectedCountry, yearKeys, densityKeys, lifeKeys)
       .style("text-anchor", "end")
       .text("Per 1000 of population");
 
-  // create y2-axis and title
+  // create y2-axis and title for LEP
   svg.append("g")
-      .attr("class", "y2 axis")
-      .attr("transform", "translate(" + width + " ,0)")
-      .call(y2Axis)
-    .append("text")
-      .attr("class", "label")
-      .attr("transform", "rotate(-90)")
-      .attr("y", -13)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text("Life expextancy in years (total population)");
-    
-  // create graph title
-  svg.append("g")
-      .attr("class", "title")
-    .append("text")
-      .attr("x", (width + margin.left + margin.right) * .09)
-      .attr("y", - margin.top / 1.7)
-      .attr("dx", ".71em")
-      .attr("font-size", "20px")
-      .style("text-anchor", "begin")
-      .text("Cool title for this multi-line graph yas"); 
+    .attr("class", "y2 axis")
+    .attr("transform", "translate(" + width + " ,0)")
+    .call(y2Axis)
+  .append("text")
+    .attr("class", "label")
+    .attr("transform", "rotate(-90)")
+    .attr("y", -13)
+    .attr("dy", ".71em")
+    .style("text-anchor", "end")
+    .text("Gross Domestic Product (USD");
 
-  // valuelines declarations
-  var densityLine = d3.svg.line()
+  // // create graph title
+  // svg.append("g")
+  //     .attr("class", "title")
+  //   .append("text")
+  //     .attr("x", (width + margin.left + margin.right) * .09)
+  //     .attr("y", - margin.top / 1.7)
+  //     .attr("dx", ".71em")
+  //     .attr("font-size", "20px")
+  //     .style("text-anchor", "begin")
+  //     .text("Cool title that is dynamic with the content"); 
+
+  // valuelines declarations - y1 lines
+  var y1Line = d3.svg.line()
     .defined(function(d) { return d; })
-    .x(function(d, i) { return x(yearArray[i]) })
+    .x(function(d, i) { return x(xArray[i]) })
     .y(function(d) { return y1(+d) });
-  var lifeLine = d3.svg.line()
+
+  // LEP or GDP lines
+  var y2Line = d3.svg.line()
     .defined(function(d) { return d; })
-    .x(function(d, i) { return x(yearArray[i]) })
-    .y(function(d) { return y2(+d) });
+    .x(function(d, i) { return x(xArray[i]) })
+    .y(function(d) { return y2(+d) });  
 
   // create right lines on svg for every variable
-  var densityLines = svg.selectAll(".densitylines")
-    .data(densityKeys)
+  var y1Lines = svg.selectAll(".y1lines")
+    .data(y1Keys)
     .enter().append("g")
-      .attr("class", "densitylines");
-  var lifeLines = svg.selectAll(".lifelines")
-    .data(lifeKeys)
+      .attr("class", "y1lines");
+  var y2Lines = svg.selectAll(".y2lines")
+    .data(y2Key)
     .enter().append("g")
-      .attr("class", "lifelines");
+      .attr("class", "y2lines");
 
   // draw lines
-  densityLines.append("path")
-      .attr("class", function(d) { return "densityline " + d; })
+  y1Lines.append("path")
+      .attr("class", function(d) { return "y1line " + d; })
       .attr("fill", "none")
       .attr("stroke-linejoin", "round")
       .attr("stroke-linecap", "round")
       .attr("stroke-width", "2")
-      .attr("d", function(d) { return densityLine(ldata[selectedCountry][d]); })
+      .attr("d", function(d) { return y1Line(ldata[selectedCountry][d]); })
       .style("stroke", function(d) { return color(d) });
-  lifeLines.append("path")
-      .attr("class", function(d) { return "lifeline " + d; })
+  y2Lines.append("path")
+      .attr("class", function(d) { return "y2line " + d; })
       .attr("fill", "none")
       .attr("stroke-linejoin", "round")
       .attr("stroke-linecap", "round")
       .attr("stroke-width", "2")
-      .attr("d", function(d) { return lifeLine(ldata[selectedCountry][d]); })
+      .attr("d", function(d) { return y2Line(ldata[selectedCountry][d]); })
       .style("stroke", function(d) { return color(d) });
+
+  // line labels
+  svg.selectAll(".y1Labels")
+      .data(y1Keys)
+    .enter().append("text")
+      .attr("transform", function(d, i) { console.log(d); return "translate(" + (width + margin.right - 70) + "," + i * 25 + ")"; })
+      .attr("dy", ".35em")
+      .attr("text-anchor", "start")
+      .style("fill", function(d) { return color(d); })
+      .text(function(d) { return d; });
+  svg.selectAll(".y2Labels")
+      .data(y2Key)
+    .enter().append("text")
+      .attr("transform", function(d, i) { console.log(d); return "translate(" + (width + margin.right - 70) + "," + 8 + i * 25 + ")"; })
+      .attr("dy", ".35em")
+      .attr("text-anchor", "start")
+      .style("fill", function(d) { return color(d); })
+      .text(function(d) { return d; });
+  // svg.append("text")
+  //   .attr("transform", function(d, i) { console.log(d); return "translate(" + (width + margin.right - 30) + "," + i * 25 + ")"; })
+  //   .attr("dy", ".35em")
+  //   .attr("text-anchor", "start")
+  //   .style("fill", "steelblue")
+  //   .text("Close");
+
+  // highlight variable line according to radio button selection
+  lineSelect(selectedVar);
 
   // // create legend
   // var legend = svg.selectAll(".legend")

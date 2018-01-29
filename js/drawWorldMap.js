@@ -5,7 +5,7 @@ Function that draws a world map using Datamaps plugin.
 Rianne Schoon, 10742794
 --------------------------------------------------------------------------- */
 
-function drawWorldMap(msdata, selectedYear, selectdVar, countryKeys, ldata, selectedCountry, yearKeys, densityKeys, lifeKeys) {
+function drawWorldMap(msdata, selectedYear, selectdVar, countryKeys, ldata, selectedCountry, yearKeys, y1Keys, lifeKeys) {
 
   /* ---------------------------------------------------------------------------
   function calcColDomain(selectedVar): 
@@ -16,6 +16,7 @@ function drawWorldMap(msdata, selectedYear, selectdVar, countryKeys, ldata, sele
     // empty arrays to fill according to data
     countrycolor = {};
     varValues = [];
+    extValues = [];
     colDomain = [];
 
     // get data for the selected country and variable in array
@@ -25,15 +26,25 @@ function drawWorldMap(msdata, selectedYear, selectdVar, countryKeys, ldata, sele
       });
     });
 
+    // array to calculate extent of not-null data
+    yearKeys.forEach(function(year) {
+      countryKeys.forEach(function(land) {
+        if (msdata[year][land][selectedVar] != 0 && msdata[year][land][selectedVar] != "") {
+          extValues.push(+msdata[year][land][selectedVar]);
+        }
+      });
+    });
+
     // determine coloring domain scale (7 color shades according to data maximum)
-    var varStep = d3.max(varValues) / 7;
+    var varExt = d3.extent(extValues);
+    var varStep = (varExt[1] - varExt[0]) / 7;
 
     // countries with missing data ('null' values) must retain gainsboro gray color
-    var coloring = 0.0001;
+    var coloring = varExt[0];
 
     // fill domain array
     for (var i = 0; i < 8; i++) {
-      colDomain.push(coloring);
+      colDomain.push(Math.round(coloring));
       coloring += varStep;
     };
 
@@ -48,21 +59,31 @@ function drawWorldMap(msdata, selectedYear, selectdVar, countryKeys, ldata, sele
   function calcColRange(selectedVar) {
 
     var colrange;
-    // physicians green, nurses red, beds blue, LEP orange, GDP purple
+    // // physicians green, nurses red, beds blue, LEP orange, GDP purple
+    // if (selectedVar == "physicians") {
+    //   colRange = ["gainsboro", "#d7f4d7", "#afe9af", "#87de87", "#5fd35f", "#37c837", "#2ca02c", "#217821"];
+    // } if (selectedVar == "nurses") {
+    //   colRange = ["gainsboro", "#f7d4d4", "#efa9a9", "#e77e7e", "#df5353", "#d62728", "#ac2020", "#811818"];
+    // } if (selectedVar == "beds") {
+    //   colRange = ["gainsboro", "#d3e9f8", "#a8d2f0", "#7cbce9", "#51a5e1", "#258fda", "#1e72ae", "#165683"];
+    // } if (selectedVar == "LEP") {
+    //   colRange = ["gainsboro", "#ffe4cc", "#ffc999", "#ffad66", "#ff9233", "#ff7700", "#cc5f00", "#994700"];
+    // } if (selectedVar == "GDP") {
+    // colRange = ["gainsboro", "#e6dcef", "#cdb8e0", "#b395d0", "#9a71c1", "#814eb1", "#673e8e", "#4d2f6a"];
+    // };
+    // return colRange;
+
+    // physicians blue, nurses orange, beds green, LEP red, GDP purple
     if (selectedVar == "physicians") {
-      colRange = ["gainsboro", "#d7f4d7", "#afe9af", "#87de87", "#5fd35f", "#37c837", "#2ca02c", "#217821"];
-    }
-    if (selectedVar == "nurses") {
-      colRange = ["gainsboro", "#f7d4d4", "#efa9a9", "#e77e7e", "#df5353", "#d62728", "#ac2020", "#811818"];
-    }
-    if (selectedVar == "beds") {
       colRange = ["gainsboro", "#d3e9f8", "#a8d2f0", "#7cbce9", "#51a5e1", "#258fda", "#1e72ae", "#165683"];
-    }
-    if (selectedVar == "LEP") {
+    } if (selectedVar == "nurses") {
       colRange = ["gainsboro", "#ffe4cc", "#ffc999", "#ffad66", "#ff9233", "#ff7700", "#cc5f00", "#994700"];
-    }
-    if (selectedVar == "GDP") {
-    colRange = ["gainsboro", "#e6dcef", "#cdb8e0", "#b395d0", "#9a71c1", "#814eb1", "#673e8e", "#4d2f6a"];
+    } if (selectedVar == "beds") {
+      colRange = ["gainsboro", "#d7f4d7", "#afe9af", "#87de87", "#5fd35f", "#37c837", "#2ca02c", "#217821"];
+    } if (selectedVar == "LEP") {
+      colRange = ["gainsboro", "#f7d4d4", "#efa9a9", "#e77e7e", "#df5353", "#d62728", "#ac2020", "#811818"];
+    } if (selectedVar == "GDP") {
+      colRange = ["gainsboro", "#e6dcef", "#cdb8e0", "#b395d0", "#9a71c1", "#814eb1", "#673e8e", "#4d2f6a"];
     };
     return colRange;
   };
@@ -84,7 +105,6 @@ function drawWorldMap(msdata, selectedYear, selectdVar, countryKeys, ldata, sele
   // determine map coloring domain and range
   var colorDomain = calcColDomain(selectedVar, yearKeys, countryKeys);
   var colorRange = calcColRange(selectedVar);
-
 
   // map coloring - domain according to data
   var color = d3.scale.threshold()
@@ -122,16 +142,22 @@ function drawWorldMap(msdata, selectedYear, selectdVar, countryKeys, ldata, sele
 
       // tooltip template - when data: show it; otherwise: just country name
       popupTemplate: function(geo, data) {
-        if (data["physicians"]) {
-          return '<div class="hoverinfo"><strong>' + geo.properties.name + 
+        if (msdata[selectedYear]) {
+          console.log(msdata[selectedYear][geo.properties.id][selectedVar]);
+          return ['<div class="hoverinfo"><strong>' + geo.properties.name + 
               '</strong><br>' + selectedVar + " " + '<strong>' 
-              + data.physicians + '</strong>'
+              + data.physicians + '</strong></div>'];
         }
         else {
-          return '<div class="hoverinfo"><strong>' + geo.properties.name 
-              +'</strong><br>'
+          console.log(msdata[selectedYear]);
+          return ['<div class="hoverinfo"><strong>' + geo.properties.name 
+              +'</strong><br>' + "No data" + '</div>'];
         }
       }
+    },
+
+    done: function(map) {
+
     }
   });
   
@@ -140,7 +166,7 @@ function drawWorldMap(msdata, selectedYear, selectdVar, countryKeys, ldata, sele
     selectedCountry = d3.select(this).attr("class").slice(-3);
     if (selectedCountry in ldata) {
       d3.selectAll(".linechart").remove();
-      drawLineGraph(ldata, selectedCountry, yearKeys, densityKeys, lifeKeys);
+      drawLineGraph(ldata, y2Key, selectedCountry, yearKeys, y1Keys, lifeKeys);
       dotSelect(selectedCountry);
     }
     else {
@@ -162,8 +188,8 @@ function drawWorldMap(msdata, selectedYear, selectdVar, countryKeys, ldata, sele
       };
       map.updateChoropleth(countrycolor);
     });
-    d3.selectAll("#scatter_svg").remove();
-    drawScatter(msdata, selectedYear, countryKeys);
+    d3.selectAll(".scatterchart").remove();
+    drawScatter(msdata, selectedYear, selectedVar, countryKeys);
   });
   
   // map dragging and zooming functionality
@@ -172,34 +198,33 @@ function drawWorldMap(msdata, selectedYear, selectdVar, countryKeys, ldata, sele
 
   // redraw map upon dragging/zooming
   function redraw() {
-    map.svg.selectAll("g")
+    map.svg.selectAll('.datamaps-subunit')
       .attr("transform", "scale(" + d3.event.scale + ")" + "translate(" + d3.event.translate + ")");
   };
 
-  // width: 750px; height: 450px;
-
   // create legend
-  var legend = map.svg.selectAll(".legend")
+  var legend = map.svg.selectAll(".maplegend")
       .data(countryKeys)
     .enter().append("g")
-      .attr("class", "legend")
-      .attr("transform", function(d, i) { return "translate(" + (750 - 70) + "," + i * 23 + ")"; })
+      .attr("class", "maplegend")
+      .attr("transform", function(d, i) { return "translate(" + (15) + "," + (240 + i * 18) + ")"; })
 
   // legend colored rectangles
   legend.append("rect")
       .data(colDomain)
-      .attr("class", function(d, i) { return "dot " + d; })
-      .attr("width", 20)
-      .attr("height", 20)
+      .attr("class", function(d, i) { return "maplegendsquare " + d; })
+      .attr("width", 15)
+      .attr("height", 15)
       .style("fill", color);
 
   // legend text
   legend.append("text")
       .data(colDomain)
-      .attr("x", -5)
-      .attr("y", 3)
+      .attr("class", "maplegendtext ")
+      .attr("x", 20)
+      .attr("y", 8)
       .attr("dy", ".35em")
-      .style("text-anchor", "end")
+      .style("text-anchor", "start")
       .style("font-size", "12px")
       .text(function(d) { return d});
 };

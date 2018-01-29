@@ -38,19 +38,39 @@ We made a style guide with our team, see STYLE.md for the consensus style and my
 ### Fri 19-01-18
 In the morning I struggled with python to fix the data. Also I made radiobuttons on the site, but they are not in the correct place and do not work with data yet. In the afternoon we had the group meeting to show everyones projects. Really cool to see, and I feel very slow with where I am at this point in time, compared to the other students. This weekend I have zero time, so stress takes over just a little bit.
 
+## Week 3
+
 ### Mon 22-01-18
 Due to the stress I managed to fix the linechart JSON this weekend! So for this week I want to finish every interactive element, basically be ready with the entire project, minus some details and minus the code quality. To this end, the radiobuttons must work, and the map-select to update the line chart and to highlight a dot in the scatterplot. Also I want a variable line to be highlighted in the line chart when the radiobuttons are selected, and I want to make crosshair functionality in the line chart. It would be really cool to have the interactive elements in the scatterplot, where the user can select what they want on every axis and in the dots, but that is an extra feature that time will have to allow me to fix. Today I wanted to finish the line chart, with correct axes and nice colors and line labels and all; as well as a label for the time slider; and that the radiobuttons update the map colors. Unfortunately I did not make a legend for the colors on the map today and the radiobuttons do not work how I want them to.
 
 ### Tue 23-02-18
-I was sick today, so I did not meet with my group. Yesterday I fixed the linechart and the label for the time slider. Today I had another go at the layout of the webpage, it is slightly better than before when I tried to place graphs next to eachother, but still it is not really how I want it. Nonetheless I decided to leave it in this layout, for now. It is pretty as long as the user does not enter half-screen or zoom in the browser too much. I thought the beauty of bootstrap was the automatic scaling and placing colums under eachother on smaller devices, but it does not work. Also I tried to grab the correct output from the radiobuttons but they keep returning LEP (one of my variables) somehow, and the other boxes do not respond. Super weird and frustrating.
+I was sick today, so I did not meet with my group and did not accomplish as much as i'd like. Yesterday I fixed the linechart lines and there are axes, although not yet in the right division, and a working updateable label for the time slider. Today I had another go at the layout of the webpage, it is slightly better than before when I tried to place graphs next to eachother, but still it is not really how I want it. Nonetheless I decided to leave it in this layout, for now. It is pretty as long as the user does not enter half-screen or zoom in the browser too much. I thought the beauty of bootstrap was the automatic scaling and placing colums under eachother on smaller devices, but it does not work. Also I tried to grab the correct output from the radiobuttons but they keep returning LEP (one of my variables) somehow, and the other boxes do not respond. Super weird and frustrating.
 
 ### Wed 24-01-18
 Met with my group and discussed our Github structure. For some days now I have not committed to Github, since the 'push' button has disappeared (I use the desktop version) and instead only pull is available. I thought that pull meant overwriting the content of the folder on my computer with whatever was on Github (old versions). But I went to Martijn and he explained to me (for the third time now) the principles of Github. Was able to commit with his help, and now my pretty map structure is also visible on Github and not just locally! Today I fixed the radiobutton functionality to update the map, fixed the on-click functionality on countries on the map to update the line chart, fixed the linechart axes division and line coloring and line labels. 
 
-### Thu
-plan van de dag
-radiobuttons goed de kleuren laten updaten in de map, en de betreffende lijn laten highlighten in de linechart, en op basis van de radiobuttons de scatterplot assen veranderen.
-scatteplot levensverwachting scheiding mannen en vrouwen maken, en dan via de legenda bepalen welke van deze twee gehighlight wordt (nu staat bij de scatterplot alle landen in de legenda, dat is echt onhandig en niet mooi).
+### Thu 25-01-18
+Radiobuttons color the map in the right way, with different colors for different datasets. The according line is highlighted in the line chart, although the lines do not yet have the same color as the variable has on the map. The layout of the webpage is updated, everything is now in the right columns and rows. Things are still a little bit to big, so a little scrolling is needed to see everything, but that is a worry for later. The damn radiobuttons still do not stay in a square but instead are all over the place. It's starting to piss me off, but they work so I will worry about their placement later. Somehow the labels in the map have vanished, spent the evening trying to get those to return and not only display the country but also the value. 
+
 volgende week:
 smooth overgangen van assen en lijnen bij het updaten (transition)
 layout van de webpage (bootstrap werkt nog steeds niet naar wens. vandaag bedacht dat het misschien ligt aan dat de container wel fluid werkt, maar dat ik de svg een harde hoogte en breedte meegeef! Daar ga ik volgende week mee bezig.
+
+### Fri 26-01-18
+In the morning I tried to get my map pop-ups back. Sadly, I only got them to return the country, not the variable value of that country. I then decided to let that go and focus on the line chart. In the linechart, two variables share the Y2 axis (GDP and life expectancy (LEP)). Today I made them share the axis, so that on a selection in the radiobutton, the axes are updated if the other variable is clicked, and the line of the selected variable is directly highligted. When a user clicks a density variable, all of which are visible at all times on the y1 axis, the line simply highlights, but the axes stay the same. I realize it is hard to know where to read which line. I figured, if I can highlight a line on a radiobutton click, I can also highlight an axis. I quickly made a label for the visible lines in the according color, in which variables will also get a higher opacity on radio button selection. Then, the weekly meeting was already, so I ended this week with a little bit of worry about all the things I still want to do next week...
+
+## Week 4
+
+### Mon 29-01-18
+Today I made the titles of all charts update according to the data depicted at any moment. The radiobuttons are now nicely aligned, and somehow that also fixed the problem of the overlapping upon screen reducement, yay! 
+
+
+todo:
+en op basis van de radiobuttons de scatterplot assen veranderen. scatteplot levensverwachting scheiding mannen en vrouwen maken, en dan via de legenda bepalen welke van deze twee gehighlight wordt (nu staat bij de scatterplot alle landen in de legenda, dat is echt onhandig en niet mooi).
+vandaag:
+legenda bij de map een gradient maken. Als ik nog tijd heb, zorgen dat hij niet naar de rechterbovenhoek verdwijnt als de map gezoomd wordt. Als dat niet meer lukt, kiezen om de map zoomfunctie eruit te halen / de legenda naast de map vast te plakken aan de website zodat hij geen kant op kan.
+andere pagina indeling zodat alles wel past zonder scrollen / uitzoomen
+dataselectie in de scatterplot op orde maken (andere variabelen op de assen bij aanklikken radiobuttons)
+als ik nog tijd heb, update functies maken zodat ik invloed heb op de transition van visualizaties, het gaat nu doormiddel van het weghalen en opnieuw maken van svg’s en dat kan smoother.
+Verder deze week: 
+alle interactie af, update functies, code netjes, handige indeling in de webpage.
