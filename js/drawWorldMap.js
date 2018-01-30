@@ -142,11 +142,13 @@ function drawWorldMap(msdata, selectedYear, selectdVar, countryKeys, ldata, sele
 
       // tooltip template - when data: show it; otherwise: just country name
       popupTemplate: function(geo, data) {
-        if (msdata[selectedYear]) {
-          console.log(msdata[selectedYear][geo.properties.id][selectedVar]);
+        console.log(msdata[selectedYear][geo.id]);
+        if (msdata[selectedYear][geo.id] != undefined && msdata[selectedYear][geo.id][selectedVar] != "") {
+          // console.log('jan');
+          console.log(msdata[selectedYear][geo.id][selectedVar]);
           return ['<div class="hoverinfo"><strong>' + geo.properties.name + 
               '</strong><br>' + selectedVar + " " + '<strong>' 
-              + data.physicians + '</strong></div>'];
+              + msdata[selectedYear][geo.id][selectedVar] + '</strong></div>'];
         }
         else {
           console.log(msdata[selectedYear]);

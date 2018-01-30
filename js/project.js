@@ -90,7 +90,7 @@ function initAll(error, msdata, ldata) {
   var countryKeys = Object.keys(msdata[selectedYear]);
 
   // Listen for radio button change and register value
-  d3.selectAll(".radio").on("change", function() {
+  d3.selectAll(".radioform").on("change", function() {
     selectedVar = d3.select(this).attr("value");
 
     // update map title and colors to selected variables

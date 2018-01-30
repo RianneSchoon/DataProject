@@ -6,21 +6,8 @@ Rianne Schoon, 10742794
 --------------------------------------------------------------------------- */
 
 function drawScatter(msdata, selectedYear, selectedVar, countryKeys, test) {
-  console.log(countryKeys);
-  console.log(selectedVar);
 
-  // if (selectedVar == "physicians" || scatX == "nurses" || scatX == "beds") {
-  //   scatY.push("LEM");
-  //   scatY.push("LEF");
-  //   scatDotSize.push["GDP"]
-  // }
-  // else if (selectedVar == "GDP") {
-  //   scatY.push("LEM");
-  //   scatY.push("LEF");
-  //   scatDotSize.push["GDP"] 
-  // }
-
-  var margin = {top: 10, right: 130, bottom: 20, left: 30},
+  var margin = {top: 10, right: 130, bottom: 20, left: 55},
     width = 750 - margin.left - margin.right,
     height = 325 - margin.top - margin.bottom;
 
