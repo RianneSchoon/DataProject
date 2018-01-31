@@ -11,13 +11,14 @@ window.onload = function() {
   queue()
     .defer(d3.json, "data/mapscatterjson.json")
     .defer(d3.json, "data/linechartjson.json")
+    .defer(d3.json, "data/variabletranslater.json")
     .await(initAll);
 };
 
 // default values for initial page load
 var selectedYear = "2000";
 var selectedVar = "physicians"
-var selectedCountry = "AUS";
+var selectedCountry = "CAN";
 // variables for linechart axes
 var y1Keys = ["physicians", "nurses", "beds"]; // var lifeKeys = ["LEP", "LEM", "LEF"];
 var y2Key = ["LEP"];
@@ -33,53 +34,15 @@ var countryKeys, yearKeys, msdata, ldata;
 function initAll(error, msdata, ldata): 
 listens to html input elements (radiobuttons and slider); calls visualizations
 --------------------------------------------------------------------------- */
-//  init function calls functions to draw map, scatterplot, linegraph
-function initAll(error, msdata, ldata) {
+function initAll(error, msdata, ldata, translations) {
   if (error) console.log("Error with data");
 
-  /* ---------------------------------------------------------------------------
-  function lineSelect(selectedVar): 
-  highlight line of variable selected in radiobuttons
-  --------------------------------------------------------------------------- */
-  function lineSelect(selectedVar) {
-
-    // all lines low opacity
-    d3.select("#line").selectAll(".y1line")
-      .style("opacity", ".3")
-      .style("stroke-width", "2px");
-    d3.select("#line").selectAll(".y2line")
-      .style("opacity", ".3")
-      .style("stroke-width", "2px");
-
-    // only selected lines high opacity, according to variable
-    if (selectedVar == "LEP") {
-      d3.select("#line").selectAll(".LEP")
-      .style("opacity", "1")
-      .style("stroke-width", "3px"); }
-    else if (selectedVar == "physicians") {
-      d3.select("#line").selectAll(".physicians")
-      .style("opacity", "1")
-      .style("stroke-width", "3px"); }
-    else if (selectedVar == "nurses") {
-      d3.select("#line").selectAll(".nurses")
-      .style("opacity", "1")
-      .style("stroke-width", "3px"); }
-    else if (selectedVar == "beds") {
-      d3.select("#line").selectAll(".beds")
-      .style("opacity", "1")
-      .style("stroke-width", "3px"); }
-    else if (selectedVar == "GDP") {
-      d3.select("#line").selectAll(".GDP")
-      .style("opacity", "1")
-      .style("stroke-width", "3px"); }
-  };
-
-
   // set initial graph titles
-  d3.select("#maptitle-value").text(selectedVar);
-  d3.select("#lineTitleY2-value").text(y2Key);
-  d3.select("#scatterTitleX-value").text(scatXVar);
-  d3.select("#scatterTitleY-value").text(scatYVar);
+  d3.select("#maptitle-value").text(translations[selectedVar]);
+  d3.select("#country-value").text(translations[selectedCountry]);
+  d3.select("#lineTitleY2-value").text(translations[y2Key]);
+  d3.select("#scatterTitleX-value").text(translations[scatXVar]);
+  d3.select("#scatterTitleY-value").text(translations[scatYVar]);
 
   // get initial slider value (year 2000) and update slider label
   var selectedYear = d3.select("#slider1").attr("value");
@@ -94,7 +57,7 @@ function initAll(error, msdata, ldata) {
     selectedVar = d3.select(this).attr("value");
 
     // update map title and colors to selected variables
-    d3.select("#maptitle-value").text(selectedVar);
+    d3.select("#maptitle-value").text(translations[selectedVar]);
     d3.select(".datamap").remove();
     drawWorldMap(msdata, selectedYear, selectedVar, countryKeys, ldata, selectedCountry, yearKeys, y1Keys, lifeKeys);
 
@@ -102,7 +65,7 @@ function initAll(error, msdata, ldata) {
     if (selectedVar == "GDP" || selectedVar == "LEP") {
 
       // linechart: update title with x-axis data
-      d3.select("#lineTitleY2-value").text(selectedVar);
+      d3.select("#lineTitleY2-value").text(translations[selectedVar]);
 
       // linechart: update axes and line highlighting
       if (y2Key[0] == selectedVar) {
@@ -118,17 +81,17 @@ function initAll(error, msdata, ldata) {
       // scatterplot: update plot
       if (selectedVar == "LEP") {
         scatXVar = ["physicians"]; scatYVar = ["LEP"]; scatDotSize = ["GDP"];
-        d3.select("#scatterTitleX-value").text(scatXVar);
-        d3.select("#scatterTitleY-value").text(scatYVar);
+        d3.select("#scatterTitleX-value").text(translations[scatXVar]);
+        d3.select("#scatterTitleY-value").text(translations[scatYVar]);
         d3.select(".scatterchart").remove();
-        drawScatter(msdata, selectedYear, selectedVar, countryKeys);
+        drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys);
       }
       else if (selectedVar == "GDP") {
         scatXVar = ["physicians"]; scatYVar = ["GDP"]; scatDotSize = ["LEP"];
-        d3.select("#scatterTitleX-value").text(scatXVar);
-        d3.select("#scatterTitleY-value").text(scatYVar);
+        d3.select("#scatterTitleX-value").text(translations[scatXVar]);
+        d3.select("#scatterTitleY-value").text(translations[scatYVar]);
         d3.select(".scatterchart").remove();
-        drawScatter(msdata, selectedYear, selectedVar, countryKeys);
+        drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys);
       };
     }
     else if (selectedVar == "physicians" || selectedVar == "nurses" || selectedVar == "beds") {
@@ -139,17 +102,17 @@ function initAll(error, msdata, ldata) {
       
       // scatterplot: update title and chart
       scatXVar = [selectedVar]; scatYVar = ["LEP"]; scatDotSize = ["GDP"];
-      d3.select("#scatterTitleX-value").text(scatXVar);
-      d3.select("#scatterTitleY-value").text(scatYVar);
+      d3.select("#scatterTitleX-value").text(translations[scatXVar]);
+      d3.select("#scatterTitleY-value").text(translations[scatYVar]);
       d3.select(".scatterchart").remove();
-      drawScatter(msdata, selectedYear, selectedVar, countryKeys)
+      drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys)
     };
   });
 
   // draw visualizations (default year 2000)
-  drawWorldMap(msdata, selectedYear, selectedVar, countryKeys, ldata, selectedCountry, yearKeys, y1Keys, lifeKeys);
+  drawWorldMap(msdata, selectedYear, selectedVar, countryKeys, ldata, selectedCountry, yearKeys, y1Keys, lifeKeys, translations);
   drawLineGraph(ldata, y2Key, selectedCountry, selectedVar, yearKeys, y1Keys, lifeKeys);
-  drawScatter(msdata, selectedYear, selectedVar, countryKeys);
+  drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys);
 
   // but do not show line chart already -> first user must select country
   // d3.selectAll(".linechart").remove();

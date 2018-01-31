@@ -5,105 +5,10 @@ Function that draws a world map using Datamaps plugin.
 Rianne Schoon, 10742794
 --------------------------------------------------------------------------- */
 
-function drawWorldMap(msdata, selectedYear, selectdVar, countryKeys, ldata, selectedCountry, yearKeys, y1Keys, lifeKeys) {
-
-  /* ---------------------------------------------------------------------------
-  function calcColDomain(selectedVar): 
-  determine map coloring domain
-  --------------------------------------------------------------------------- */
-  function calcColDomain(selectedVar, yearKeys, countryKeys) {
-
-    // empty arrays to fill according to data
-    countrycolor = {};
-    varValues = [];
-    extValues = [];
-    colDomain = [];
-
-    // get data for the selected country and variable in array
-    yearKeys.forEach(function(year) {
-      countryKeys.forEach(function(land) {
-        varValues.push(+msdata[year][land][selectedVar]);
-      });
-    });
-
-    // array to calculate extent of not-null data
-    yearKeys.forEach(function(year) {
-      countryKeys.forEach(function(land) {
-        if (msdata[year][land][selectedVar] != 0 && msdata[year][land][selectedVar] != "") {
-          extValues.push(+msdata[year][land][selectedVar]);
-        }
-      });
-    });
-
-    // determine coloring domain scale (7 color shades according to data maximum)
-    var varExt = d3.extent(extValues);
-    var varStep = (varExt[1] - varExt[0]) / 7;
-
-    // countries with missing data ('null' values) must retain gainsboro gray color
-    var coloring = varExt[0];
-
-    // fill domain array
-    for (var i = 0; i < 8; i++) {
-      colDomain.push(Math.round(coloring));
-      coloring += varStep;
-    };
-
-    // return coloring domain according to data
-    return colDomain;
-  };
-
-  /* ---------------------------------------------------------------------------
-  function calcColRange(selectedVar): 
-  determine map coloring range
-  --------------------------------------------------------------------------- */
-  function calcColRange(selectedVar) {
-
-    var colrange;
-    // // physicians green, nurses red, beds blue, LEP orange, GDP purple
-    // if (selectedVar == "physicians") {
-    //   colRange = ["gainsboro", "#d7f4d7", "#afe9af", "#87de87", "#5fd35f", "#37c837", "#2ca02c", "#217821"];
-    // } if (selectedVar == "nurses") {
-    //   colRange = ["gainsboro", "#f7d4d4", "#efa9a9", "#e77e7e", "#df5353", "#d62728", "#ac2020", "#811818"];
-    // } if (selectedVar == "beds") {
-    //   colRange = ["gainsboro", "#d3e9f8", "#a8d2f0", "#7cbce9", "#51a5e1", "#258fda", "#1e72ae", "#165683"];
-    // } if (selectedVar == "LEP") {
-    //   colRange = ["gainsboro", "#ffe4cc", "#ffc999", "#ffad66", "#ff9233", "#ff7700", "#cc5f00", "#994700"];
-    // } if (selectedVar == "GDP") {
-    // colRange = ["gainsboro", "#e6dcef", "#cdb8e0", "#b395d0", "#9a71c1", "#814eb1", "#673e8e", "#4d2f6a"];
-    // };
-    // return colRange;
-
-    // physicians blue, nurses orange, beds green, LEP red, GDP purple
-    if (selectedVar == "physicians") {
-      colRange = ["gainsboro", "#d3e9f8", "#a8d2f0", "#7cbce9", "#51a5e1", "#258fda", "#1e72ae", "#165683"];
-    } if (selectedVar == "nurses") {
-      colRange = ["gainsboro", "#ffe4cc", "#ffc999", "#ffad66", "#ff9233", "#ff7700", "#cc5f00", "#994700"];
-    } if (selectedVar == "beds") {
-      colRange = ["gainsboro", "#d7f4d7", "#afe9af", "#87de87", "#5fd35f", "#37c837", "#2ca02c", "#217821"];
-    } if (selectedVar == "LEP") {
-      colRange = ["gainsboro", "#f7d4d4", "#efa9a9", "#e77e7e", "#df5353", "#d62728", "#ac2020", "#811818"];
-    } if (selectedVar == "GDP") {
-      colRange = ["gainsboro", "#e6dcef", "#cdb8e0", "#b395d0", "#9a71c1", "#814eb1", "#673e8e", "#4d2f6a"];
-    };
-    return colRange;
-  };
-
-  /* ---------------------------------------------------------------------------
-  function dotSelect(country): 
-  data highlighting: clicking on map makes strokes dot in scatterplot black
-  --------------------------------------------------------------------------- */
-  function dotSelect (country) {
-    d3.select("#scatter").selectAll(".dot")
-      .style("stroke", "white")
-      .style("opacity", ".3")
-    d3.select("#scatter").select("." + country)
-      .style("stroke", "black")
-      .style("stroke-width", "2px")
-      .style("opacity", "1");
-  };
+function drawWorldMap(msdata, selectedYear, selectdVar, countryKeys, ldata, selectedCountry, yearKeys, y1Keys, lifeKeys, translations) {
 
   // determine map coloring domain and range
-  var colorDomain = calcColDomain(selectedVar, yearKeys, countryKeys);
+  var colorDomain = calcColDomain(msdata, selectedVar, yearKeys, countryKeys);
   var colorRange = calcColRange(selectedVar);
 
   // map coloring - domain according to data
@@ -142,41 +47,43 @@ function drawWorldMap(msdata, selectedYear, selectdVar, countryKeys, ldata, sele
 
       // tooltip template - when data: show it; otherwise: just country name
       popupTemplate: function(geo, data) {
-        console.log(msdata[selectedYear][geo.id]);
         if (msdata[selectedYear][geo.id] != undefined && msdata[selectedYear][geo.id][selectedVar] != "") {
-          // console.log('jan');
-          console.log(msdata[selectedYear][geo.id][selectedVar]);
           return ['<div class="hoverinfo"><strong>' + geo.properties.name + 
               '</strong><br>' + selectedVar + " " + '<strong>' 
               + msdata[selectedYear][geo.id][selectedVar] + '</strong></div>'];
         }
         else {
-          console.log(msdata[selectedYear]);
           return ['<div class="hoverinfo"><strong>' + geo.properties.name 
               +'</strong><br>' + "No data" + '</div>'];
         }
       }
-    },
-
-    done: function(map) {
-
     }
   });
   
-  // on click: update linechart according to country
+  // clicking country in map updates linechart and scatterplot
   map.svg.selectAll('.datamaps-subunit').on('click', function() {
     selectedCountry = d3.select(this).attr("class").slice(-3);
+
+    // update current selection text
+    d3.select("#country-value").text(translations[selectedCountry]);
+
+    // when the country clicked is in dataset
     if (selectedCountry in ldata) {
+      // update linechart and title
+      d3.select("#noDataText").style("display", "none");
       d3.selectAll(".linechart").remove();
-      drawLineGraph(ldata, y2Key, selectedCountry, yearKeys, y1Keys, lifeKeys);
+      drawLineGraph(ldata, y2Key, selectedCountry, selectedVar, yearKeys, y1Keys, lifeKeys);
+      d3.select("#lineTitleY2-value").text(translations[selectedVar]);
+      // highlight country dot in scatterplot
       dotSelect(selectedCountry);
     }
+    // when there is no data, display text saying no data, unselect all dots
     else {
-      d3.selectAll(".densitylines").remove();
-      d3.selectAll(".lifelines").remove();
+      d3.selectAll(".linechart").remove();
+      d3.select("#noDataText").style("display", "inline");
+      d3.select("#noDataText-value").text("No data available for " + translations[selectedCountry]);
       d3.select("#scatter").selectAll(".dot").style("stroke", "white").style("opacity", ".3")
     }
-   
   });
 
   // on sliderinput: update map colors, sliderlabel, scatterplot
@@ -191,7 +98,7 @@ function drawWorldMap(msdata, selectedYear, selectdVar, countryKeys, ldata, sele
       map.updateChoropleth(countrycolor);
     });
     d3.selectAll(".scatterchart").remove();
-    drawScatter(msdata, selectedYear, selectedVar, countryKeys);
+    drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys);
   });
   
   // map dragging and zooming functionality

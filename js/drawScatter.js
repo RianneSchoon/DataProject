@@ -5,7 +5,7 @@ Function that draws a scatterplot with clickable legend.
 Rianne Schoon, 10742794
 --------------------------------------------------------------------------- */
 
-function drawScatter(msdata, selectedYear, selectedVar, countryKeys, test) {
+function drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys, test) {
 
   var margin = {top: 10, right: 130, bottom: 20, left: 55},
     width = 750 - margin.left - margin.right,
@@ -20,7 +20,7 @@ function drawScatter(msdata, selectedYear, selectedVar, countryKeys, test) {
   var yAxis = d3.svg.axis().scale(y).orient("left");
 
   // enable scatterplot dots to be colored
-  var color = d3.scale.category20();
+  var color = d3.scale.category10();
 
   // append scatterplot svg to html body
   var svg = d3.select("#scatter").append("svg")
@@ -89,29 +89,30 @@ function drawScatter(msdata, selectedYear, selectedVar, countryKeys, test) {
   //     .attr("font-size", "20px")
   //     .style("text-anchor", "begin")
   //     .text("Relation between physician density and population life expectancy");  
-
+  // console.log(ldata["SVK"]);
   // create dots
   scatterDot = svg.selectAll(".dot")
       .data(countryKeys)
     .enter().append("circle")
-      .attr("class", function(d) { return "dot " + d; })
+      .attr("class", function(d) { return "dot " + d + " " + ldata[d].Continent; })
       .attr("r", function(d) { return rscale(+msdata[selectedYear][d][scatDotSize]); })
       .attr("cx", function(d) { return x(+msdata[selectedYear][d][scatXVar]); })
       .attr("cy", function(d) { return y(+msdata[selectedYear][d][scatYVar]); })
-      .style("fill", color);
+      .style("fill", function(d) { return color(ldata[d].Continent); });
       // .style("fill", function(d) { return color(+msdata[selectedYear][d]); })
 
   // create legend with data selection functionality on click
+  var continents = ["Africa", "Americas", "Asia", "Europe", "Oceania"]
   var legend = svg.selectAll(".legend")
-      .data(countryKeys)
+      .data(continents)
     .enter().append("g")
       .attr("class", "legend")
       .attr("transform", function(d, i) { return "translate(" + (width + margin.right - 70) + "," + i * 7 + ")"; })
-      .on('click', function(region) { return legendSelect(region); });
+      .on('click', function(continent) { return legendSelect(continent); });
 
   // legend colored rectangles
   legend.append("rect")
-      .data(countryKeys)
+      .data(continents)
       .attr("class", function(d) { return "dot " + d; })
       .attr("width", 6)
       .attr("height", 6)
@@ -119,40 +120,13 @@ function drawScatter(msdata, selectedYear, selectedVar, countryKeys, test) {
 
   // legend text
   legend.append("text")
-      .data(countryKeys)
+      .data(continents)
       .attr("x", -5)
       .attr("y", 3)
       .attr("dy", ".35em")
       .style("text-anchor", "end")
       .style("font-size", "6px")
-      .text(function (d) { return d; });
-
-  // enable data selection in scatterplot via the legend
-
-  function legendSelect (region) {
-    // if no subset of data has been clicked yet: clicked subset of data pops out
-    if (clicked == 0) {
-      d3.selectAll(".dot").style("opacity", .3).style("stroke-width", "1px").style("stroke", "white");
-      // the "replace" part: no spaces in the class name (see line 147)
-      d3.selectAll("." + region.replace(/\s/g, '')).style("opacity", 1);
-      clickedData = region
-      clicked = 1;
-    }
-    // if a selected data subset is clicked again: reset graph to no pop-outs
-    else if (clicked == 1 && region == clickedData) {
-      d3.selectAll(".dot").style("opacity", 1).style("stroke-width", "1px").style("stroke", "white");
-      clickedData = region
-      clicked = 0;
-    } 
-    // if a data subset has been selected, but now another subset is clicked: 
-    // switch pop-out to last clicked subset
-    else if (clicked == 1 && region != clickedData) {
-      d3.selectAll(".dot").style("opacity", .3);
-      d3.selectAll("." + region.replace(/\s/g, '')).style("opacity", 1).style("stroke-width", "1px").style("stroke", "white");
-      clickedData = region
-      clicked = 1;
-    } 
-  };
+      .text(function (d) { return d; });  
 
   // map and scatterplot: enabling tooltip functionality
   var tooltip_s = d3.select("#scatter").append("div").attr("class", "tooltip sct hidden");
@@ -176,8 +150,37 @@ function drawScatter(msdata, selectedYear, selectedVar, countryKeys, test) {
           "<strong>GDP:</strong> <span style='color:midnightblue'>" + msdata[selectedYear][d]["GDP"] + "</span>");
     })
 
-    // when mouse moves away, tooltip disappears
-    .on("mouseout",  function(d, i) {
-      tooltip_s.classed("hidden", true);
-    })
+  // when mouse moves away, tooltip disappears
+  .on("mouseout",  function(d, i) {
+    tooltip_s.classed("hidden", true);
+  });
+
+  /* ---------------------------------------------------------------------------
+  function legendSelect(region): 
+  highlight country in scatterplot by giving it a black line
+  --------------------------------------------------------------------------- */
+  function legendSelect (continent) {
+    // if no subset of data has been clicked yet: clicked subset of data pops out
+    if (clicked == 0) {
+      d3.selectAll(".dot").style("opacity", .3).style("stroke-width", "1px").style("stroke", "white");
+      // the "replace" part: no spaces in the class name (see line 147)
+      d3.selectAll("." + continent).style("opacity", 1);
+      clickedData = continent
+      clicked = 1;
+    }
+    // if a selected data subset is clicked again: reset graph to no pop-outs
+    else if (clicked == 1 && continent == clickedData) {
+      d3.selectAll(".dot").style("opacity", 1).style("stroke-width", "1px").style("stroke", "white");
+      clickedData = continent
+      clicked = 0;
+    } 
+    // if a data subset has been selected, but now another subset is clicked: 
+    // switch pop-out to last clicked subset
+    else if (clicked == 1 && continent != clickedData) {
+      d3.selectAll(".dot").style("opacity", .3);
+      d3.selectAll("." + continent).style("opacity", 1).style("stroke-width", "1px").style("stroke", "white");
+      clickedData = continent
+      clicked = 1;
+    } 
+  };
 };

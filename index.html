@@ -22,6 +22,7 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
   <script src="//datamaps.github.io/scripts/0.5.0/datamaps.world.hires.min.js"></script>
   <script src="//d3js.org/queue.v1.min.js"></script>
+  <script src="js/functions.js" charset="utf-8"></script>
   <script src="js/drawWorldMap.js" charset="utf-8"></script>
   <script src="js/drawLineGraph.js" charset="utf-8"></script>
   <script src="js/drawScatter.js" charset="utf-8"></script>
@@ -75,7 +76,7 @@
       <div class="clearfix"></div>
       <p align="justify"><strong>Most people do!</strong> However, even if you avoid accidents and murderers, you still have to face disease, infections, and eventually wear and tear due to old age - to eternity. Nonetheless, we still try to prolong our lifes as much as possible. The success of this endeavor varies greatly.<strong></p>
       <p align="justify">Let us explore some supporting means of health care and their influence on life expectancy around the world!</strong></p>
-      <p align="justify">The health care variables are: amount of <i>doctors</i>, <i>nurses</i>, and <i>available hospital beds</i>; <i>life expectancy</i>; and <i>Gross Domestic Product</i>. The <b>map</b>, <b>line chart</b> and <b>scatterplot</b> let you explore the distribution, relation, and development of these variables. Select data with the <b>buttons</b> and select the year with the <b>slider</b>. Hover over graphs and click countries, lines and dots to see additional information pop up and to update the other graphs!</p>
+      <p align="justify">The health care variables are: amount of <i>doctors</i>, <i>nurses</i>, and <i>available hospital beds</i>; <i>life expectancy</i>; and <i>Gross Domestic Product</i>. The <b>map</b>, <b>line chart</b> and <b>scatterplot</b> let you explore the distribution, relation, and development of these variables. Select data with the <b>buttons</b> and select the year with the <b>slider</b>. Hover over graphs and click on countries, lines and dots to see additional information pop up and to update the other graphs!</p>
     </div>
   </div>
 </div>
@@ -83,39 +84,37 @@
 <div id="works-section">
   <!-- Container -->
   <div class="container-fluid">
-
     <div class="row">
       <div class="col-sm-6">
         <div class="section-title text-center center">
           <h2>World map: <span id="maptitle-value">...</span></h2>
           <div class="chart" id="container0" style="position: relative; width: 750px; height: 400px;"> 
           </div>
+          <h3 style="font-size: 23px">Selected country: <span id="country-value">...</span></h2>
         </div>
       </div>
       <div class="col-sm-6">
         <div class="section-title text-center center">
-          <h2>Please select year (1960 - 2016)</h2>
-        </div>
-        <!-- Container -->
-        <div>
+          <h2>Options</h2><hr>
+          <h3 style="font-size: 23px">Please select year (1960 - 2016)</h3>
+        <!-- </div>
+        Container
+        <div> -->
           <form>
             <div class="timeslider">
               <p align="center">
-                <label for="slider1" style="position: absolute; width 45px; margin-top: 25px; text-align: center; font-size: 20px">Selected year: <span id="slider1-value">...</span>
-                </label>
+                <!-- <label for="slider1" style="position: absolute; width 45px; margin-top: 25px; text-align: center; font-size: 20px">Selected year: <span id="slider1-value">...</span>
+                </label> -->
                 <input id="slider1" type="range" min="1960" max="2016" value="2000" step="1">
+                <h3 style="font-size: 18px"> Selected year: <span id="slider1-value">...</span></h3>
               </p>
             </div> 
           </form>
-          <p>. </p>
-          <p>. </p>
         </div>
         <!-- Container -->
         <div class="section-title text-center center">
-          <h2>Please select health care variable</h2>
-        </div>
-        <div>
-          <form align="center">
+          <h3 style="font-size: 23px">Please select health care variable</h3>
+          <form>
             <input align="center" class="radioform" type="radio" name="chooseone" value="LEP">Life expectancy (years)</br>
             <input align="center" class="radioform" type="radio" name="chooseone" value="physicians" checked>Physicians per 1000 of population<br>
             <input align="center" class="radioform" type="radio" name="chooseone" value="nurses">Nurses per 1000 of population<br>
@@ -135,8 +134,10 @@
       <div class="col-sm-6">
         <!-- <div class="container"> -->
         <div class="section-title text-center center">
-          <h2>Density (y1) and <span id="lineTitleY2-value">...</span> (y2)</h2>
-          <div class="chart" id="line"></div>
+          <h2>Density and <span id="lineTitleY2-value">...</span> in time</h2>
+          <div class="chart" id="line">
+            <h3 id="noDataText" style="font-size: 23px"><br><br><span id="noDataText-value"></span></h3>
+          </div>
         </div>
       </div>
       <!-- <div id="works-section"> -->

@@ -184,3 +184,7 @@ header p {
   color: #0dad8d;
   border-color: #fff;
 }
+
+#noDataText-value {
+  font-size: 10px;
+}

@@ -7,42 +7,60 @@ Rianne Schoon, 10742794
 
 function drawLineGraph (ldata, y2Key, selectedCountry, selectedVar, yearKeys, y1Keys, lifeKeys) {
 
-  /* ---------------------------------------------------------------------------
-  function lineSelect(selectedVar): 
-  highlight line of variable selected in radiobuttons
-  --------------------------------------------------------------------------- */
-  function lineSelect(selectedVar) {
+// /* ---------------------------------------------------------------------------
+//   function lineSelect(selectedVar): 
+//   highlight line of variable selected in radiobuttons
+//   --------------------------------------------------------------------------- */
+//   function lineSelect(selectedVar) {
 
-    // all lines low opacity
-    d3.select("#line").selectAll(".y1line")
-      .style("opacity", ".3")
-      .style("stroke-width", "2px");
-    d3.select("#line").selectAll(".y2line")
-      .style("opacity", ".3")
-      .style("stroke-width", "2px");
+//     // all lines and legend elements low opacity
+//     d3.select("#line").selectAll(".y1line")
+//       .style("opacity", ".3")
+//       .style("stroke-width", "2px");
+//     d3.select("#line").selectAll(".y2line")
+//       .style("opacity", ".3")
+//       .style("stroke-width", "2px");
+//     d3.select(".linelabel")
+//       .style("opacity", ".3")
+//       .style("font-weight", "normal");
 
-    // only selected lines high opacity, according to variable
-    if (selectedVar == "LEP") {
-      d3.select("#line").selectAll(".LEP")
-      .style("opacity", "1")
-      .style("stroke-width", "3px"); }
-    else if (selectedVar == "physicians") {
-      d3.select("#line").selectAll(".physicians")
-      .style("opacity", "1")
-      .style("stroke-width", "3px"); }
-    else if (selectedVar == "nurses") {
-      d3.select("#line").selectAll(".nurses")
-      .style("opacity", "1")
-      .style("stroke-width", "3px"); }
-    else if (selectedVar == "beds") {
-      d3.select("#line").selectAll(".beds")
-      .style("opacity", "1")
-      .style("stroke-width", "3px"); }
-    else if (selectedVar == "GDP") {
-      d3.select("#line").selectAll(".GDP")
-      .style("opacity", "1")
-      .style("stroke-width", "3px"); }
-  };
+//     // only selected lines high opacity, according to variable
+//     if (selectedVar == "LEP") {
+//       d3.select("#line").selectAll(".LEP")
+//         .style("opacity", "1")
+//         .style("stroke-width", "3px")
+//       d3.select(".linelabel").selectAll(".LEP")
+//         .style("opacity", "1")
+//         .style("font-weight", "bold"); }
+//     else if (selectedVar == "physicians") {
+//       d3.select("#line").selectAll(".physicians")
+//         .style("opacity", "1")
+//         .style("stroke-width", "3px")
+//       d3.select(".linelabel").selectAll(".physicians")
+//         .style("opacity", "1")
+//         .style("font-weight", "bold"); }
+//     else if (selectedVar == "nurses") {
+//       d3.select("#line").selectAll(".nurses")
+//         .style("opacity", "1")
+//         .style("stroke-width", "3px")
+//       d3.select(".linelabel").selectAll(".nurses")
+//         .style("opacity", "1")
+//         .style("font-weight", "bold"); }
+//     else if (selectedVar == "beds") {
+//       d3.select("#line").selectAll(".beds")
+//         .style("opacity", "1")
+//         .style("stroke-width", "3px")
+//       d3.select(".linelabel").selectAll(".beds")
+//         .style("opacity", "1")
+//         .style("font-weight", "bold"); }
+//     else if (selectedVar == "GDP") {
+//       d3.select("#line").selectAll(".GDP")
+//         .style("opacity", "1")
+//         .style("stroke-width", "3px")
+//       d3.select(".linelabel").selectAll(".GDP")
+//         .style("opacity", "1")
+//         .style("font-weight", "bold"); }
+//   };
 
   // set height, width and margins
   var margin = {top: 10, right: 130, bottom: 20, left: 30},
@@ -186,6 +204,7 @@ function drawLineGraph (ldata, y2Key, selectedCountry, selectedVar, yearKeys, y1
   svg.selectAll(".y1Labels")
       .data(y1Keys)
     .enter().append("text")
+      .attr("class", function(d) { return "linelabel " + d; })
       .attr("transform", function(d, i) { return "translate(" + (width + margin.right - 70) + "," + i * 25 + ")"; })
       .attr("dy", ".35em")
       .attr("text-anchor", "start")
@@ -194,6 +213,7 @@ function drawLineGraph (ldata, y2Key, selectedCountry, selectedVar, yearKeys, y1
   svg.selectAll(".y2Labels")
       .data(y2Key)
     .enter().append("text")
+      .attr("class", function(d) { return "linelabel " + d; })
       .attr("transform", function(d, i) {; return "translate(" + (width + margin.right - 70) + "," + 8 + i * 25 + ")"; })
       .attr("dy", ".35em")
       .attr("text-anchor", "start")
@@ -208,6 +228,32 @@ function drawLineGraph (ldata, y2Key, selectedCountry, selectedVar, yearKeys, y1
 
   // highlight variable line according to radio button selection
   lineSelect(selectedVar);
+
+  // clicking country in map updates linechart and scatterplot
+  map.svg.selectAll('.datamaps-subunit').on('click', function() {
+    selectedCountry = d3.select(this).attr("class").slice(-3);
+
+    // update current selection text
+    d3.select("#country-value").text(translations[selectedCountry]);
+
+    // when the country clicked is in dataset
+    if (selectedCountry in ldata) {
+      // update linechart and title
+      d3.select("#noDataText").style("display", "none");
+      d3.selectAll(".linechart").remove();
+      drawLineGraph(ldata, y2Key, selectedCountry, selectedVar, yearKeys, y1Keys, lifeKeys);
+      d3.select("#lineTitleY2-value").text(translations[selectedVar]);
+      // highlight country dot in scatterplot
+      dotSelect(selectedCountry);
+    }
+    // when there is no data, display text saying no data, unselect all dots
+    else {
+      d3.selectAll(".linechart").remove();
+      d3.select("#noDataText").style("display", "inline");
+      d3.select("#noDataText-value").text("No data available for " + translations[selectedCountry]);
+      d3.select("#scatter").selectAll(".dot").style("stroke", "white").style("opacity", ".3")
+    }
+  });
 
   // // create legend
   // var legend = svg.selectAll(".legend")
