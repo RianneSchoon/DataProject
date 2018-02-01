@@ -1,36 +1,31 @@
-/*
-linked.css
-Style sheet to a webpage that shows two linked visualizations.
+/* ----------------------------------------------------------------------------------------
+project.css
 
-Rianne Schoon, 10742794
+Webpage showing supporting means of health care and their influence on life expectancy 
+around the world. The page has three visualizations and two additional interactive options:
 
-Sources and credits:
-*/
+Rianne Schoon, 10742794 
+-----------------------------------------------------------------------------------------*/
 
-/* line around country on hover */
 .country:hover{
   stroke: gold;
   stroke-width: 3px;
 }
 
-/* logo and name */
 .navbar-header {
   color: white;
 }
 
-/* page title centered */
 .title {
   text-align: center;
   font: 30px tahoma;
 }
 
-/* my name centered */
 .name {
   text-align: center;
   font: 21px tahoma;
 }
 
-/* introtext and data source styling */
 .intro, 
 .source {
   text-align: center;
@@ -77,7 +72,6 @@ div.tooltip {
   stroke-width: 1px;
 }
 
-/* time slider */
 #slider1, .radio1 {
   width: 50%;
   display: block;
@@ -88,14 +82,12 @@ div.tooltip {
   display: none;
 }
 
-/* font for axes and ticks */
 #scatter {
   font: 12x tahoma;
   text-align: center;
   color: black;
 }
 
-/* color axes */
 .axis path,
 .axis line {
   fill: none;
@@ -104,7 +96,6 @@ div.tooltip {
   shape-rendering: crispEdges;
 }
 
-/* dot stroke color default */
 .dot {
   stroke: white;
 }
@@ -151,7 +142,6 @@ label {
   float: right;
 }
 
-/* Home Style */
 header {
   background: url(../img/header-bg.jpg) no-repeat bottom right;
   background-size: cover;
@@ -159,11 +149,13 @@ header {
   position: relative;
   height: 50%;
 }
+
 header p {
   color: rgba(255,255,255,0.8);
   font-size: 20px;
   margin-bottom: 80px;
 }
+
 .intro-text {
   position: relative;
   padding-top: 10px;
@@ -171,11 +163,13 @@ header p {
   padding-left: 0;
   padding-bottom: 10px;
 }
+
 .intro-text H1 {
   font-size: 60px;
   text-transform: uppercase;
   color: #fff;
 }
+
 .btn-default {
   color: #fff;
   font-family: 'Open Sans', sans-serif;
@@ -187,6 +181,7 @@ header p {
   transition: all 0.5s;
   border-radius: 4px;
 }
+
 .btn-default:hover, .btn-default:focus, .btn-default.focus, .btn-default:active, .btn-default.active {
   background-color: #fff;
   color: #0dad8d;
