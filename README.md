@@ -34,7 +34,7 @@ The health care variables are the amount of doctors, nurses, and available hospi
 
 
 ### Sketches:
-![](doc/Dia1.PNG)
+![](doc/screenshotReadme.PNG)
 
 ## Prerequisites
 
@@ -47,8 +47,11 @@ The health care variables are the amount of doctors, nurses, and available hospi
 -* d3js.org/queue.v1.min.js
 -* labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js
 -* jQuery
+-* datamaps.github.io/scripts/0.5.0/datamaps.world.hires.min.js
 
-### Hardest parts
-The hardest part is going to be the coloring of the map - I have not done that in previous weeks, so that is new.
+### Credits and sources
+- Source: http://www.oecd.org/health/health-statistics.htm
+- Datamaps: Copyright (c) 2012 Mark DiMarco
+- Bootstrap template: http://www.templatewire.com
 
 Copyright &copy; Rianne Schoon 2018
