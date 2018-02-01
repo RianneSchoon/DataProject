@@ -1,31 +1,47 @@
 # Report Programming project Dataprocessing
 ### Rianne Schoon 12724794
-based on your design document, containing important decisions that you’ve made, e.g. where you changed your mind during the past weeks. This is how you show the reviewer that you actually understand what you have done.
+
+<!-- based on your design document, containing important decisions that you’ve made, e.g. where you changed your mind during the past weeks. This is how you show the reviewer that you actually understand what you have done. -->
 
 ## My application 
-Start with a short description of your application (like in the README.md, but very short, including a single screen shot).
+<!-- Start with a short description of your application (like in the README.md, but very short, including a single screen shot). -->
 
 ### Do you want to live a long, healthy life? 
 Most people do! However, even if you avoid accidents and murderers, you still have to face disease, infections, and eventually wear and tear due to old age - to eternity. Nonetheless, we still try to prolong our lifes as much as possible. The success of this endeavor varies greatly. 
+
 #### Let us explore some supporting means of health care and their influence on life expectancy around the world!
 
-### Overview
+### Short overview
 The health care variables are the amount of doctors, nurses, and available hospital beds per 1000 of population; Life expectancy in years; and Gross Domestic Product (GDP) in USD ($). The map, linechart and scatterplot let you explore the distribution, relation, and development of these variables. Additional options to select time and variables stimulate exploration even further!
 
-### Usage
+## Technical design
+
+### Functionality - high level overview
 Initially, the world map shows the amount of physicians per 1000 people in countries around the world, in the year 2000. Select other variables and years by using the slider and radiobuttons. As you can see, every variable has its own color. You will notice that not every country has data. Only countries that are affiliated with The Organisation for Economic Co-operation and Development (OECD) are selected, so that validity of the data and investigation methods can be guaranteed. Variables and their according colors are also visible in the linechart. There you can see several variables for a single country, in time. Click on the map to select a country! Physicians, nurses, and hospital beds relate to the left y-axis. GDP and Life expectancy alternate on the right y-axis. The grey line shows the year selected with the slider. When another variable is selected with the radiobuttons, the line is highlighted in the linechart, and the scatterplot is updated. In the scatterplot, the health care variables alternate on the y-axis. When those are selected in the buttons, Life expectancy is on the y-axis and GDP is in the size of the dots. When GDP is selected, it goes on the y-axis and Life expectancy goes in the size of the dots. Hover over dots to see the information. Clicking a country in the map highlights that country in the scatterplot. Or select countries yourself, by clicking on the legend to highlight an entire continent!
 
-## Technical design
-how is the functionality implemented in your code? This should be like your DESIGN.md but updated to reflect the final application. 
+### Functionality - details
 
-First, give a high level overview, which helps us navigate and understand the total of your code (which components are there?). 
-Second, go into detail, and describe the modules/classes (apps) files/functions (data) and how they relate.
+The website HTML is a bootstrap template that I have filled with my own layout and content. Therefore, the CSS is mostly of bootstrap origin. In the "css" folder, only "project.css" was made by yours truly. Also the "fonts" and "mail" folders are of bootstrap origin.
+
+In the "data" folder, I have three JSONS. "linechartjson.json" and "mapscatterjson.json" contain the same data, but in a different format that is useful for each visualization. In variabletranslater.json, all three-letter countrycodes are paired to their full name, as well as my variable shortcuts and their full form. This translator is used to update titles and legends on the page into readable formats.
+The "doc" folder consists images for DESIGN.md and README.md. This is a supplement to the "img" folder, which contains bootstrap images as well as the header background picture. 
+
+In the "js" folder, there are some bootstrap JavaScript files as well. For my own project only four scripts are important, which I will discuss in the order they are called in my project.
+First and foremost, there is "project.js", which functions as a main (only that filename was already occupied by bootstrap). Here, the three data files are loaded in queue when the window is loaded, and some global variables are declared. Then, an "initAll" function is called where the values of the html input elements are monitored (slider and radiobuttons) and the visualizations are called. Each visualization has it's own function, with subfunctions.
+
+The function "drawWorldMap" draws a world map using Datamaps plugin voor D3.js. Coloring of the map according to data is calculated by two functions that are also declared in this file. "calcColDomain" determines the map coloring domain by calculating the extent of data and dividing this difference into 8 buckets. To calculate the domain, the function "roundValues" is called to round values to a certain precision. The output array is combined with the output of calcColRange to form a dictionary for datamaps. "calcColRange" determines the map coloring range with different colors according to the variable. Each color is divided into 8 buckets with different color intensities. When a country is clicked, the linechart is removed and redrawn. Also, the according dot is highlighted in the scatterplot with the function "dotSelect".
+
+The function "drawLineGraph" draws a multiline graph with two y-axes. Lines and labels highlight on radio input. Input is listened in "project".js, where the linechart is removed and drawn again if the y2 axis needs to change (since this axis is both for GDP and Life expectancy). The highlighting of lines and labels happens with a funciton "lineSelect", called in the drawLineGraph function, which makes all line and legend elements low opacity, and then highlights the currently radio-selected variable. On hover, a tooltip appears with information on which lines corresponds to which line.
+
+The function "drawScatter" draws a scatterplot in which dots represent countries, with coloring according to the continent the country is in. The representation of variables depends on the radio button selection. In case Life expectancy or a health care variable is selected (physicians, nurses, hospital beds), health care will be on the x-axis of the scatterplot, Life expectancy will be on the y-axis, and GDP in the size of the dot. In case GDP is selected, it goes on the y-axis, and life expectancy goes in the dotsize. By clicking the legend, a subset of countries belonging to that continent can be selected with the function "legendSelect" Double-clicking the legend unselects the data again.
 
 ## Challenges
-Clearly describe challenges that your have met during development. Document all important changes that your have made with regard to your design document (from the PROCESS.md). Here, we can see how much you have learned in the past month.
+At first I really struggled with finding data that tells an interesting story. I kept coming up with interesting research questions and was unable to find data to answer. After a while, I switched to just searching for a nice dataset with consistent subject/countries/years/investigation method. This was really against my academic principles to first have data and then a question. 
+However, compared to the data conversion from csv to json, the aforementioned struggle was nothing. I had a really hard time getting the data in the right format. It took a lot of assistance to get it done. I learned a great deal about useful python methods like setDefault and dictReader. 
+Since I had never worked with Datamaps before (my previous map was made with topojson), it took me a while to get to know how to manipulate the map and make it fit my needs. However, it really is a lot less code than another map, which is nice. During the project there were some times when it was not clear to me what Datamaps do under the hood. For example, with the topojson map it was fairly easy to implement zoom, but I still did not get it how I want it with datamaps.
+When I divided all my code over several files (project.js and the draw functions), I came across another struggle. It is really hard to loose track of all variables and updatings and function calls when everything is connected to everything else. It took me a full week to learn how to work with this division of code, that it doesn not work to do ctrl-x before the code is ALSO somewhere else as backup.
+Furthermore, I struggled with the multiline graph, since in week 5 of Dataprocessing this project did not go well. However, now I have the feeling that I really understand it! The radiobuttons also proved tricky, but I really liked learning how to handle input.
+I do not think I have ever been happier than when my map coloring was working, and the slider updated the color shadings. So cool!! Same with the radiobutton selection, when they update the map color, I am really content with all those happy colors (which, of course, also serve the purpose of distincting variables, and consistency of variable colors across graphs).
 
 ## Arguments
-Defend your decisions by writing an argument of a most a single paragraph. Why was it good to do it different than you thought before? Are there trade-offs for your current solution? In an ideal world, given much more time, would you choose another solution?
-
-## Reflection
-Make sure the document is complete and reflects the final state of the application. The document will be an important part of your grade.
+I am glad with how my webpage turned out. There are a lot of interactive elements, and none of them make another one superfluous. Therefore I am glad that I did not make the linechart clickable in order to update the scatterplot, since that would do the same as the radiobuttons and that may be confusing, or at least otiose. Also, in the end the scatterplot turned out a bit more sober than initially planned. I did not get to make the menu that would allow the user to select which variable they want on which axis. Instead, this is updated rather fixed manner, with every radiobutton selection having a specific effect on the scatterplot layout. This is not necessarily regrettable, because it gives clarity to the page. However, honesty requires that it would have been awesome to give the user more freedom to explore the data and answer their own questions. Given more time, I would definately make sure the user has more freedom and that there is more information available (both to select, to place in a graph, and to explore on hover). Nonetheless, I think that the main question asked on the page, about the influence of health care on life expectancy, is still answerable since the independent health care variables, physicians/nurses/hospital beds, are always on the x-axis of the scatterplot.

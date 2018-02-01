@@ -142,30 +142,16 @@ function drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys, tran
         .style("x", 20)
         .style("y", 20)
         .attr("style", "left:" + (mouse[0] + offsetL) + "px;top:" + (mouse[1] + offsetT)+"px")
-        .html("<strong>Country:</strong> <span style='color:midnightblue'>" + d + "</span>" + "<br>" +
-          "<strong>" + translations[scatXVar] + "</strong> <span style='color:midnightblue'>" + roundValues(msdata[selectedYear][d][scatXVar], 1) + "</span>" + "<br>" +
-          "<strong>" + translations[scatYVar] + "</strong> <span style='color:midnightblue'>" + roundValues(msdata[selectedYear][d][scatYVar], 1) + "</span>" + "<br>" + 
-          "<strong>" + translations[scatDotSize] + "</strong> <span style='color:midnightblue'>" + roundValues(msdata[selectedYear][d][scatDotSize], 1) + "</span>");
+        .html("<strong>" + translations[d] + "</span>" + "<br>" +
+          "<span style='font-weight: normal'>" + translations[scatXVar] + ": " + roundValues(msdata[selectedYear][d][scatXVar], 1) + "</span>" + "<br>" +
+          "<span style='font-weight: normal'>" + translations[scatYVar] + ": " + roundValues(msdata[selectedYear][d][scatYVar], 1) + "</span>" + "<br>" + 
+          "<span style='font-weight: normal'>" + translations[scatDotSize] + ": " + roundValues(msdata[selectedYear][d][scatDotSize], 1) + "</span>");
     })
 
   // when mouse moves away, tooltip disappears
   .on("mouseout",  function(d, i) {
     tooltip_s.classed("hidden", true);
   });
-};
-
-/* ---------------------------------------------------------------------------
-function dotSelect(country): 
-data highlighting: clicking on map makes strokes dot in scatterplot black
---------------------------------------------------------------------------- */
-function dotSelect (country) {
-  d3.select("#scatter").selectAll(".dot")
-    .style("stroke", "white")
-    .style("opacity", ".3")
-  d3.select("#scatter").select("." + country)
-    .style("stroke", "black")
-    .style("stroke-width", "2px")
-    .style("opacity", "1");
 };
 
 /* ---------------------------------------------------------------------------

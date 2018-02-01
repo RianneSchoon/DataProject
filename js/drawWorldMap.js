@@ -146,7 +146,9 @@ function drawWorldMap(msdata, selectedYear, selectdVar, countryKeys, ldata, sele
 
 /* ---------------------------------------------------------------------------
 function calcColDomain(msdata, selectedVar, yearKeys, countryKeys): 
-determine map coloring domain.
+determine map coloring domain. firstly it calculates the extent of data. This
+difference is then divided into 8 buckets, which are returned in an array to 
+combine with the output of calcColRange to form a dictionary for datamaps.
 --------------------------------------------------------------------------- */
 function calcColDomain(msdata, selectedVar, yearKeys, countryKeys) {
 
@@ -191,7 +193,9 @@ function calcColDomain(msdata, selectedVar, yearKeys, countryKeys) {
 
 /* ---------------------------------------------------------------------------
 function calcColRange(selectedVar): 
-determine map coloring range
+determine map coloring range with different colors according to the variable.
+colors are divided into 8 buckets with different color intensities, to combine
+with the output of calcColDomain to form a dictionary for datamaps.
 --------------------------------------------------------------------------- */
 function calcColRange(selectedVar) {
 
@@ -214,8 +218,22 @@ function calcColRange(selectedVar) {
 };
 
 /* ---------------------------------------------------------------------------
+function dotSelect(country): 
+data highlighting: clicking on map makes strokes dot in scatterplot black
+--------------------------------------------------------------------------- */
+function dotSelect (country) {
+  d3.select("#scatter").selectAll(".dot")
+    .style("stroke", "white")
+    .style("opacity", ".3")
+  d3.select("#scatter").select("." + country)
+    .style("stroke", "black")
+    .style("stroke-width", "2px")
+    .style("opacity", "1");
+};
+
+/* ---------------------------------------------------------------------------
 function roundValues(value, precision): 
-rounds values to 1 decimal place
+rounds values to a specified number of decimal places
 --------------------------------------------------------------------------- */
 function roundValues(value, precision) {
   var multiplier = Math.pow(10, precision || 0);
