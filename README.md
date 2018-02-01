@@ -42,12 +42,12 @@ The health care variables are the amount of doctors, nurses, and available hospi
 * http://www.oecd.org/health/health-statistics.htm
 
 ### External components
--* d3js.org/d3.v3.min.js
--* d3js.org/topojson.v1.min.js
--* d3js.org/queue.v1.min.js
--* labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js
--* jQuery
--* datamaps.github.io/scripts/0.5.0/datamaps.world.hires.min.js
+* d3js.org/d3.v3.min.js
+* d3js.org/topojson.v1.min.js
+* d3js.org/queue.v1.min.js
+* labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js
+* jQuery
+* datamaps.github.io/scripts/0.5.0/datamaps.world.hires.min.js
 
 ### Credits and sources
 - Source: http://www.oecd.org/health/health-statistics.htm
