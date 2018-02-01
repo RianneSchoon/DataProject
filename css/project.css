@@ -13,6 +13,11 @@ Sources and credits:
   stroke-width: 3px;
 }
 
+/* logo and name */
+.navbar-header {
+  color: white;
+}
+
 /* page title centered */
 .title {
   text-align: center;
@@ -79,6 +84,9 @@ div.tooltip {
   margin: auto;
 }
 
+#countryCode {
+  display: none;
+}
 
 /* font for axes and ticks */
 #scatter {
@@ -186,5 +194,5 @@ header p {
 }
 
 #noDataText-value {
-  font-size: 10px;
+  font-size: 30px;
 }

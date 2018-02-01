@@ -1,181 +1,199 @@
 <!DOCTYPE html>
 
+<!-- 
+index.html
+
+Webpage showing supporting means of health care and their influence on life expectancy 
+around the world. The page has three visualizations and two additional interactive options:
+- world map showing health care, life expectancy, and GDP per country
+- multiLine chart with two axes showing health care data in time 
+- scatterplot showing relations between health care, life expectancy, and GDP
+- time slider to select a year
+- radiobuttons to select a data variable
+  
+Rianne Schoon, 10742794 
+-->
+
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Project</title>
-  <meta name="description" content="">
-  <meta name="author" content="">
-  <!-- Bootstrap -->
-  <link rel="stylesheet" type="text/css"  href="css/bootstrap.css">
-  <link rel="stylesheet" type="text/css" href="fonts/font-awesome/css/font-awesome.css">
-  <!-- Stylesheet -->
-  <link rel="stylesheet" type="text/css"  href="css/style.css">
-  <link rel="stylesheet" type="text/css" href="css/prettyPhoto.css">
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,900,300' rel='stylesheet' type='text/css'>
-  <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,800,600,300' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="css/project.css"></link>
-  <script type="text/javascript" src="js/modernizr.custom.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
-  <script src="//datamaps.github.io/scripts/0.5.0/datamaps.world.hires.min.js"></script>
-  <script src="//d3js.org/queue.v1.min.js"></script>
-  <script src="js/functions.js" charset="utf-8"></script>
-  <script src="js/drawWorldMap.js" charset="utf-8"></script>
-  <script src="js/drawLineGraph.js" charset="utf-8"></script>
-  <script src="js/drawScatter.js" charset="utf-8"></script>
-  <script src="js/project.js" charset="utf-8"></script>
-</head>
-<body>
-<!-- Navigation -->
-<nav id="menu" class="navbar navbar-default navbar-fixed-top">
-  <div class="container"> 
-    <!-- Brand and toggle get grouped for better mobile display -->
-    <div class="navbar-header" 
-      <a class="navbar-brand"><i class="fa fa-sun-o"></i><strong> Rianne Schoon</strong><br>Project data processing</a>
-    </div>
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav navbar-right">
-        <li><a href="#home" class="page-scroll">Home</a></li>
-        <li><a href="#services-section" class="page-scroll">Intro</a></li>
-          <!-- <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal"></button>
-              <h4 class="modal-title">Basic Bootstrap Modal</h4>
-            </div>
-            <div class="modal-body">
-              <p>The Bootstrap Modal is a lightweight multi-purpose JavaScript popup that is customizable and responsive.</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-          </div> -->
-        <li><a href="#works-section" class="page-scroll">World map</a></li>
-        <li><a href="#about-section" class="page-scroll">Line/scattergraphs</a></li>
-        <!-- <li><a href="#works-section" class="page-scroll">Scatterplot</a></li> -->
-      </ul>
-    </div>
-  </div>
-</nav>
-<!-- Header -->
-<header class="text-center" name="home">
-  <div class="intro-text">
-    <h1><strong>Welcome! </strong> Explore ...</h1>
-    <p>... the influence of health care on life expectancy</p>
-    <a href="#services-section" class="btn btn-default btn-lg page-scroll">To the introduction!</a> 
-  </div>
-</header>
-<!-- Services Section -->
-<div id="services-section" class="text-center">
-  <div class="container" style="width: 800px; height: 350px;">
-    <div class="section-title center">
-      <h2>Do you want to live forever?</h2>
-      <hr>
-      <div class="clearfix"></div>
-      <p align="justify"><strong>Most people do!</strong> However, even if you avoid accidents and murderers, you still have to face disease, infections, and eventually wear and tear due to old age - to eternity. Nonetheless, we still try to prolong our lifes as much as possible. The success of this endeavor varies greatly.<strong></p>
-      <p align="justify">Let us explore some supporting means of health care and their influence on life expectancy around the world!</strong></p>
-      <p align="justify">The health care variables are: amount of <i>doctors</i>, <i>nurses</i>, and <i>available hospital beds</i>; <i>life expectancy</i>; and <i>Gross Domestic Product</i>. The <b>map</b>, <b>line chart</b> and <b>scatterplot</b> let you explore the distribution, relation, and development of these variables. Select data with the <b>buttons</b> and select the year with the <b>slider</b>. Hover over graphs and click on countries, lines and dots to see additional information pop up and to update the other graphs!</p>
-    </div>
-  </div>
-</div>
-<!-- Worldmap Section -->
-<div id="works-section">
-  <!-- Container -->
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-sm-6">
-        <div class="section-title text-center center">
-          <h2>World map: <span id="maptitle-value">...</span></h2>
-          <div class="chart" id="container0" style="position: relative; width: 750px; height: 400px;"> 
-          </div>
-          <h3 style="font-size: 23px">Selected country: <span id="country-value">...</span></h2>
-        </div>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Project</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" type="text/css"  href="css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="fonts/font-awesome/css/font-awesome.css">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" type="text/css"  href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/prettyPhoto.css">
+    <link href='https://fonts.googleapis.com/css?family=Lato:400,700,900,300' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700,800,600,300' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="css/project.css"></link>
+    
+    <!-- Scripts -->
+    <script type="text/javascript" src="js/modernizr.custom.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+    <script src="//datamaps.github.io/scripts/0.5.0/datamaps.world.hires.min.js"></script>
+    <script src="//d3js.org/queue.v1.min.js"></script>
+    <script src="js/functions.js" charset="utf-8"></script>
+    <script src="js/drawWorldMap.js" charset="utf-8"></script>
+    <script src="js/drawLineGraph.js" charset="utf-8"></script>
+    <script src="js/drawScatter.js" charset="utf-8"></script>
+    <script src="js/project.js" charset="utf-8"></script>
+  </head>
+  <body>
+
+  <!-- Navigation -->
+  <nav id="menu" class="navbar navbar-default navbar-fixed-top">
+    <div class="container"> 
+
+      <!-- Brand and toggle grouped for better display -->
+      <div class="navbar-header" 
+        <a class="navbar-brand"><i class="fa fa-sun-o"></i><strong> Rianne Schoon</strong><br>Project data processing</a>
       </div>
-      <div class="col-sm-6">
-        <div class="section-title text-center center">
-          <h2>Options</h2><hr>
-          <h3 style="font-size: 23px">Please select year (1960 - 2016)</h3>
-        <!-- </div>
-        Container
-        <div> -->
-          <form>
-            <div class="timeslider">
-              <p align="center">
-                <!-- <label for="slider1" style="position: absolute; width 45px; margin-top: 25px; text-align: center; font-size: 20px">Selected year: <span id="slider1-value">...</span>
-                </label> -->
-                <input id="slider1" type="range" min="1960" max="2016" value="2000" step="1">
-                <h3 style="font-size: 18px"> Selected year: <span id="slider1-value">...</span></h3>
-              </p>
-            </div> 
-          </form>
-        </div>
-        <!-- Container -->
-        <div class="section-title text-center center">
-          <h3 style="font-size: 23px">Please select health care variable</h3>
-          <form>
-            <input align="center" class="radioform" type="radio" name="chooseone" value="LEP">Life expectancy (years)</br>
-            <input align="center" class="radioform" type="radio" name="chooseone" value="physicians" checked>Physicians per 1000 of population<br>
-            <input align="center" class="radioform" type="radio" name="chooseone" value="nurses">Nurses per 1000 of population<br>
-            <input align="center" class="radioform" type="radio" name="chooseone" value="beds">Hospital beds per 1000 of population<br>
-            <input align="center" class="radioform" type="radio" name="chooseone" value="GDP">Gross Domestic Product (USD)<br>
-          </form>
-        </div>
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#home" class="page-scroll">Home</a></li>
+          <li><a href="#services-section" class="page-scroll">Intro</a></li>
+          <li><a href="#works-section" class="page-scroll">World map</a></li>
+          <li><a href="#about-section" class="page-scroll">Line/scattergraphs</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <header class="text-center" name="home">
+    <div class="intro-text">
+      <h1><strong>Welcome! </strong> Explore ...</h1>
+      <p>... the influence of health care on life expectancy</p>
+      <a href="#services-section" class="btn btn-default btn-lg page-scroll">To the introduction!</a> 
+    </div>
+  </header>
+
+  <!-- Introduction Section -->
+  <div id="services-section" class="text-center">
+    <div class="container" style="width: 800px; height: 350px;">
+      <div class="section-title center">
+        <h2>Do you want to live forever?</h2>
+        <hr>
+        <div class="clearfix"></div>
+        <p align="justify"><strong>Most people do!</strong> However, even if you avoid accidents and murderers, you still have to face disease, infections, and eventually wear and tear due to old age - to eternity. Nonetheless, we still try to prolong our lifes as much as possible. The success of this endeavor varies greatly.<strong></p>
+        <p align="justify">Let us explore some supporting means of health care and their influence on life expectancy around the world!</strong></p>
+        <p align="justify">The health care variables are: amount of <i>doctors</i>, <i>nurses</i>, and <i>available hospital beds</i>; <i>life expectancy</i>; and <i>Gross Domestic Product</i>. The <b>map</b>, <b>line chart</b> and <b>scatterplot</b> let you explore the distribution, relation, and development of these variables. Select data with the <b>buttons</b> and select the year with the <b>slider</b>. Hover over graphs and click on countries, lines and dots to see additional information pop up and to update the other graphs!</p>
       </div>
     </div>
   </div>
-</div>
-<!-- Line chart Section -->
-<div id="about-section">
-  <!-- Container -->
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-sm-6">
-        <!-- <div class="container"> -->
-        <div class="section-title text-center center">
-          <h2>Density and <span id="lineTitleY2-value">...</span> in time</h2>
-          <div class="chart" id="line">
-            <h3 id="noDataText" style="font-size: 23px"><br><br><span id="noDataText-value"></span></h3>
-          </div>
-        </div>
-      </div>
-      <!-- <div id="works-section"> -->
-      <div class="container-fluid">
+
+  <!-- Worldmap and Options Section -->
+  <div id="works-section">
+    <div class="container-fluid">
+      <div class="row">
+
+        <!-- World map -->
         <div class="col-sm-6">
           <div class="section-title text-center center">
-            <h2><span id="scatterTitleX-value">...</span> vs. <span id="scatterTitleY-value">...</span></h2>
-            <div class="chart" id="scatter"></div>
+            <h2>World map: <span id="maptitle-value">...</span></h2>
+            <div class="chart" id="container0" style="position: relative; width: 750px; height: 400px;"> 
+            </div>
+            <h3 style="font-size: 23px">Selected country: <span id="country-value">...</span></h3>
+          </div>
+        </div>
+
+        <!-- Options -->
+        <div class="col-sm-6">
+          <div class="section-title text-center center">
+            <h2>Options</h2><hr>
+            <div class="section-title text-center center">
+              <h3 style="font-size: 23px">Please select year (1960 - 2016)</h3>
+
+              <!-- Slider  -->
+              <form>
+                <div class="timeslider">
+                  <p align="center">
+                    <!-- <label for="slider1" style="position: absolute; width 45px; margin-top: 25px; text-align: center; font-size: 20px">Selected year: <span id="slider1-value">...</span>
+                    </label> -->
+                    <input id="slider1" type="range" min="1960" max="2016" value="2000" step="1">
+                    <h3 style="font-size: 18px"> Selected year: <span id="slider1-value">...</span></h3>
+                  </p>
+                </div> 
+              </form>
+            </div>
+          </div>
+
+          <!-- Radiobuttons -->
+          <div class="section-title text-center center optionsrow">
+            <h3 style="font-size: 23px">Please select health care variable</h3>
+            <form>
+              <input align="center" class="radioform" type="radio" name="chooseone" value="LEP">Life expectancy (years)</br>
+              <input align="center" class="radioform" type="radio" name="chooseone" value="physicians" checked>Physicians per 1000 of population<br>
+              <input align="center" class="radioform" type="radio" name="chooseone" value="nurses">Nurses per 1000 of population<br>
+              <input align="center" class="radioform" type="radio" name="chooseone" value="beds">Hospital beds per 1000 of population<br>
+              <input align="center" class="radioform" type="radio" name="chooseone" value="GDP">Gross Domestic Product (USD)<br>
+            </form>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
-<!-- Footer Section -->
-<div id="footer">
-  <div class="container">
-    <div class="fnav">
-      <div class="source"><a href="http://www.oecd.org/health/health-statistics.htm">Data source: Organisation for Economic Co-operation and Development</a></div><p>Project Dataprocessing  by <b>Rianne Schoon</b> 10742794<br>Website: Copyright &copy; Helios. Designed by <a href="http://www.templatewire.com" rel="nofollow">TemplateWire</a></p>
+
+  <!-- Linechart and Scatterplot Section -->
+  <div id="about-section">
+    <div class="container-fluid">
+      <div class="row">
+
+        <!-- Linechart -->
+        <div class="col-sm-6">
+          <div class="section-title text-center center">
+            <h2>Health care and <span id="lineTitleY2-value">...</span> in time</h2>
+            <div class="chart" id="line">
+              <h3 id="noDataText" style="font-size: 23px"><br><br><span id="noDataText-value"></span></h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scatterplot -->
+        <div class="container-fluid">
+          <div class="col-sm-6">
+            <div class="section-title text-center center">
+              <h2><span id="scatterTitleX-value">...</span> vs. <span id="scatterTitleY-value">...</span></h2>
+              <div class="chart" id="scatter"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> 
-<script type="text/javascript" src="js/jquery.1.11.1.js"></script> 
-<!-- Include all compiled plugins (below), or include individual files as needed --> 
-<script type="text/javascript" src="js/bootstrap.js"></script> 
-<script type="text/javascript" src="js/SmoothScroll.js"></script> 
-<script type="text/javascript" src="js/jquery.counterup.js"></script> 
-<script type="text/javascript" src="js/waypoints.js"></script> 
-<script type="text/javascript" src="js/jquery.prettyPhoto.js"></script> 
-<script type="text/javascript" src="js/jquery.isotope.js"></script> 
-<script type="text/javascript" src="js/jqBootstrapValidation.js"></script> 
-<script type="text/javascript" src="js/contact_me.js"></script> 
+  <!-- Footer Section -->
+  <div id="footer">
+    <div class="container">
+      <div class="fnav">
+        <div class="source"><a href="http://www.oecd.org/health/health-statistics.htm">Data source: Organisation for Economic Co-operation and Development</a></div><p>Project Dataprocessing  by <b>Rianne Schoon</b> 10742794<br>Website: Copyright &copy; Helios. Designed by <a href="http://www.templatewire.com" rel="nofollow">TemplateWire</a><div id="countryCode">CAN</div></p>
+      </div>
+    </div>
+  </div>
 
-<!-- Javascripts
-    ================================================== --> 
-<script type="text/javascript" src="js/main.js"></script>
-</body>
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> 
+  <script type="text/javascript" src="js/jquery.1.11.1.js"></script> 
+  
+  <!-- Include all compiled plugins (below), or include individual files as needed --> 
+  <script type="text/javascript" src="js/bootstrap.js"></script> 
+  <script type="text/javascript" src="js/SmoothScroll.js"></script> 
+  <script type="text/javascript" src="js/jquery.counterup.js"></script> 
+  <script type="text/javascript" src="js/waypoints.js"></script> 
+  <script type="text/javascript" src="js/jquery.prettyPhoto.js"></script> 
+  <script type="text/javascript" src="js/jquery.isotope.js"></script> 
+  <script type="text/javascript" src="js/jqBootstrapValidation.js"></script> 
+  <script type="text/javascript" src="js/contact_me.js"></script> 
+
+  <!-- Javascripts --> 
+  <script type="text/javascript" src="js/main.js"></script>
+  </body>
 </html>

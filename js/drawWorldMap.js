@@ -1,6 +1,9 @@
 /* ---------------------------------------------------------------------------
 drawWorldMap.js
+
 Function that draws a world map using Datamaps plugin.
+Coloring of the map according to data is calculated with functions. On-click,
+on-hover, zoom, and drag functionality on countries and map.
 
 Rianne Schoon, 10742794
 --------------------------------------------------------------------------- */
@@ -63,6 +66,7 @@ function drawWorldMap(msdata, selectedYear, selectdVar, countryKeys, ldata, sele
   // clicking country in map updates linechart and scatterplot
   map.svg.selectAll('.datamaps-subunit').on('click', function() {
     selectedCountry = d3.select(this).attr("class").slice(-3);
+    d3.select("#countryCode").text(selectedCountry);
 
     // update current selection text
     d3.select("#country-value").text(translations[selectedCountry]);
@@ -72,7 +76,7 @@ function drawWorldMap(msdata, selectedYear, selectdVar, countryKeys, ldata, sele
       // update linechart and title
       d3.select("#noDataText").style("display", "none");
       d3.selectAll(".linechart").remove();
-      drawLineGraph(ldata, y2Key, selectedCountry, selectedVar, yearKeys, y1Keys, lifeKeys);
+      drawLineGraph(ldata, y2Key, selectedCountry, selectedVar, lineKeys, yearKeys, y1Keys, lifeKeys, translations);
       d3.select("#lineTitleY2-value").text(translations[selectedVar]);
       // highlight country dot in scatterplot
       dotSelect(selectedCountry);

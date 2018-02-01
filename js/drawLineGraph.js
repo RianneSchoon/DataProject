@@ -1,69 +1,17 @@
 /* ---------------------------------------------------------------------------
 drawLineGraph.js
-Function that draws a multi line graph with two y-axes.
+
+Function that draws a multi line graph with two y-axes. 
+Lines and axes update and highlight on map-click. The time selected by slider 
+is shown as a vertical line. Hovering lines lets information pop-up in tooltip.
 
 Rianne Schoon, 10742794
 --------------------------------------------------------------------------- */
 
-function drawLineGraph (ldata, y2Key, selectedCountry, selectedVar, yearKeys, y1Keys, lifeKeys) {
-
-// /* ---------------------------------------------------------------------------
-//   function lineSelect(selectedVar): 
-//   highlight line of variable selected in radiobuttons
-//   --------------------------------------------------------------------------- */
-//   function lineSelect(selectedVar) {
-
-//     // all lines and legend elements low opacity
-//     d3.select("#line").selectAll(".y1line")
-//       .style("opacity", ".3")
-//       .style("stroke-width", "2px");
-//     d3.select("#line").selectAll(".y2line")
-//       .style("opacity", ".3")
-//       .style("stroke-width", "2px");
-//     d3.select(".linelabel")
-//       .style("opacity", ".3")
-//       .style("font-weight", "normal");
-
-//     // only selected lines high opacity, according to variable
-//     if (selectedVar == "LEP") {
-//       d3.select("#line").selectAll(".LEP")
-//         .style("opacity", "1")
-//         .style("stroke-width", "3px")
-//       d3.select(".linelabel").selectAll(".LEP")
-//         .style("opacity", "1")
-//         .style("font-weight", "bold"); }
-//     else if (selectedVar == "physicians") {
-//       d3.select("#line").selectAll(".physicians")
-//         .style("opacity", "1")
-//         .style("stroke-width", "3px")
-//       d3.select(".linelabel").selectAll(".physicians")
-//         .style("opacity", "1")
-//         .style("font-weight", "bold"); }
-//     else if (selectedVar == "nurses") {
-//       d3.select("#line").selectAll(".nurses")
-//         .style("opacity", "1")
-//         .style("stroke-width", "3px")
-//       d3.select(".linelabel").selectAll(".nurses")
-//         .style("opacity", "1")
-//         .style("font-weight", "bold"); }
-//     else if (selectedVar == "beds") {
-//       d3.select("#line").selectAll(".beds")
-//         .style("opacity", "1")
-//         .style("stroke-width", "3px")
-//       d3.select(".linelabel").selectAll(".beds")
-//         .style("opacity", "1")
-//         .style("font-weight", "bold"); }
-//     else if (selectedVar == "GDP") {
-//       d3.select("#line").selectAll(".GDP")
-//         .style("opacity", "1")
-//         .style("stroke-width", "3px")
-//       d3.select(".linelabel").selectAll(".GDP")
-//         .style("opacity", "1")
-//         .style("font-weight", "bold"); }
-//   };
+function drawLineGraph (ldata, y2Key, selectedCountry, selectedVar, lineKeys, yearKeys, y1Keys, lifeKeys, translations) {
 
   // set height, width and margins
-  var margin = {top: 10, right: 130, bottom: 20, left: 30},
+  var margin = {top: 10, right: 180, bottom: 20, left: 30},
     width = 750 - margin.left - margin.right,
     height = 325 - margin.top - margin.bottom;
 
@@ -78,7 +26,8 @@ function drawLineGraph (ldata, y2Key, selectedCountry, selectedVar, yearKeys, y1
   var y2Axis = d3.svg.axis().scale(y2).orient("right");
 
   // enable lines to be colored
-  var color = d3.scale.category10();
+  // var color = d3.scale.category10();
+  var color = {"physicians": "#1f77b4", "nurses": "#ff7f0e", "beds": "#2ca02c", "LEP": "#d62728", "GDP": "#9467bd"};
 
   // append svg to html body
   var svg = d3.selectAll("#line").append("svg")
@@ -114,7 +63,8 @@ function drawLineGraph (ldata, y2Key, selectedCountry, selectedVar, yearKeys, y1
 
   // create x-axis and title
   svg.append("g")
-      .attr("class", "x axis")
+      .attr("class", "linexaxis")
+      .attr("class", "axis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis)
     .append("text")
@@ -126,7 +76,8 @@ function drawLineGraph (ldata, y2Key, selectedCountry, selectedVar, yearKeys, y1
 
   // create y1-axis and title
   svg.append("g")
-      .attr("class", "y1 axis")
+      .attr("class", "liney1axis")
+      .attr("class", "axis")
       .call(y1Axis)
     .append("text")
       .attr("class", "label")
@@ -134,31 +85,36 @@ function drawLineGraph (ldata, y2Key, selectedCountry, selectedVar, yearKeys, y1
       .attr("y", 6)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("Per 1000 of population");
+      .text("Health care (per 1000 of population)");
 
   // create y2-axis and title for LEP
   svg.append("g")
-    .attr("class", "y2 axis")
+    .attr("class", "liney2axis")
+    .attr("class", "axis")
     .attr("transform", "translate(" + width + " ,0)")
     .call(y2Axis)
-  .append("text")
-    .attr("class", "label")
-    .attr("transform", "rotate(-90)")
-    .attr("y", -13)
-    .attr("dy", ".71em")
-    .style("text-anchor", "end")
-    .text("Gross Domestic Product (USD");
-
-  // // create graph title
-  // svg.append("g")
-  //     .attr("class", "title")
-  //   .append("text")
-  //     .attr("x", (width + margin.left + margin.right) * .09)
-  //     .attr("y", - margin.top / 1.7)
-  //     .attr("dx", ".71em")
-  //     .attr("font-size", "20px")
-  //     .style("text-anchor", "begin")
-  //     .text("Cool title that is dynamic with the content"); 
+    
+  if (selectedVar == "GDP") {
+    d3.select(liney2axis)
+      .append("text")
+        .attr("class", "label")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -13)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Gross Domestic Product (USD");
+  }
+  else if (selectedVar == "LEP") {
+    d3.select(liney2axis)
+      .append("text")
+        .attr("class", "label")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -13)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Life expectancy (years)");
+  }
+  
 
   // valuelines declarations - y1 lines
   var y1Line = d3.svg.line()
@@ -190,7 +146,7 @@ function drawLineGraph (ldata, y2Key, selectedCountry, selectedVar, yearKeys, y1
       .attr("stroke-linecap", "round")
       .attr("stroke-width", "2")
       .attr("d", function(d) { return y1Line(ldata[selectedCountry][d]); })
-      .style("stroke", function(d) { return color(d) });
+      .style("stroke", function(d) { return color[d]; });
   y2Lines.append("path")
       .attr("class", function(d) { return "y2line " + d; })
       .attr("fill", "none")
@@ -198,61 +154,64 @@ function drawLineGraph (ldata, y2Key, selectedCountry, selectedVar, yearKeys, y1
       .attr("stroke-linecap", "round")
       .attr("stroke-width", "2")
       .attr("d", function(d) { return y2Line(ldata[selectedCountry][d]); })
-      .style("stroke", function(d) { return color(d) });
+      .style("stroke", function(d) { return color[d]; });
 
   // line labels
   svg.selectAll(".y1Labels")
       .data(y1Keys)
     .enter().append("text")
       .attr("class", function(d) { return "linelabel " + d; })
-      .attr("transform", function(d, i) { return "translate(" + (width + margin.right - 70) + "," + i * 25 + ")"; })
+      .attr("transform", function(d, i) { return "translate(" + (width + 55) + "," + i * 25 + ")"; })
       .attr("dy", ".35em")
       .attr("text-anchor", "start")
-      .style("fill", function(d) { return color(d); })
-      .text(function(d) { return d; });
+      .style("fill", function(d) { return color[d]; })
+      .text(function(d) { return translations[d]; });
   svg.selectAll(".y2Labels")
       .data(y2Key)
     .enter().append("text")
       .attr("class", function(d) { return "linelabel " + d; })
-      .attr("transform", function(d, i) {; return "translate(" + (width + margin.right - 70) + "," + 8 + i * 25 + ")"; })
+      .attr("transform", function(d, i) {; return "translate(" + (width + 55) + "," + 8 + i * 25 + ")"; })
       .attr("dy", ".35em")
       .attr("text-anchor", "start")
-      .style("fill", function(d) { return color(d); })
-      .text(function(d) { return d; });
-  // svg.append("text")
-  //   .attr("transform", function(d, i) { console.log(d); return "translate(" + (width + margin.right - 30) + "," + i * 25 + ")"; })
-  //   .attr("dy", ".35em")
-  //   .attr("text-anchor", "start")
-  //   .style("fill", "steelblue")
-  //   .text("Close");
+      .style("fill", function(d) { return color[d]; })
+      .text(function(d) { return translations[d]; });
 
   // highlight variable line according to radio button selection
   lineSelect(selectedVar);
 
-  // clicking country in map updates linechart and scatterplot
-  map.svg.selectAll('.datamaps-subunit').on('click', function() {
-    selectedCountry = d3.select(this).attr("class").slice(-3);
+  // clicking line to see where the axes light up
+  d3.selectAll('.line').on('click', function() {
+    console.log(d3.select(this).attr("class").slice(17));
 
     // update current selection text
     d3.select("#country-value").text(translations[selectedCountry]);
+  });
 
-    // when the country clicked is in dataset
-    if (selectedCountry in ldata) {
-      // update linechart and title
-      d3.select("#noDataText").style("display", "none");
-      d3.selectAll(".linechart").remove();
-      drawLineGraph(ldata, y2Key, selectedCountry, selectedVar, yearKeys, y1Keys, lifeKeys);
-      d3.select("#lineTitleY2-value").text(translations[selectedVar]);
-      // highlight country dot in scatterplot
-      dotSelect(selectedCountry);
-    }
-    // when there is no data, display text saying no data, unselect all dots
-    else {
-      d3.selectAll(".linechart").remove();
-      d3.select("#noDataText").style("display", "inline");
-      d3.select("#noDataText-value").text("No data available for " + translations[selectedCountry]);
-      d3.select("#scatter").selectAll(".dot").style("stroke", "white").style("opacity", ".3")
-    }
+  // tooltip functionality
+  var tooltip_s = d3.select(".linechart").append("div").attr("class", "tooltip sct hidden");
+
+  // offsets for tooltips
+  var offsetL = document.getElementsByClassName('linechart').offsetLeft + 50;
+  var offsetT = document.getElementsByClassName('linechart').offsetTop + 40;
+
+  // tooltips appear when mouse is over country - and follow mouse movements
+  y1Lines
+    .on("mouseover", function(d, i) {
+      console.log("movementtttt")
+
+      // tooltip visible centered on dot when mouse moves over dot
+      var mouse = d3.mouse(svg.node()).map( function(d) { return parseInt(d); });
+      tooltip_s.classed("hidden", false)
+        .style("x", 20)
+        .style("y", 20)
+        .attr("style", "left:" + (mouse[0] + offsetL) + "px;top:" + (mouse[1] + offsetT)+"px")
+        .html("<strong>Country:</strong> <span style='color:midnightblue'>" + selectedCountry + "</span>" + "<br>" +
+          "<strong>variable:</strong> <span style='color:midnightblue'>" + translate[selectedVar] + "</span>");
+    })
+
+  // when mouse moves away, tooltip disappears
+  .on("mouseout",  function(d, i) {
+    tooltip_s.classed("hidden", true);
   });
 
   // // create legend

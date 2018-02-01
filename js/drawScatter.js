@@ -1,12 +1,17 @@
 /* ---------------------------------------------------------------------------
 drawScatter.js
-Function that draws a scatterplot with clickable legend.
+
+Function that draws scatterplot. 
+Dots represent countries; legend clickable to highlight data by continent. 
+Hovering dots lets information pop-up in tooltip. Country selection in map
+highlights the dot. The axes update according to radio button selection.
 
 Rianne Schoon, 10742794
 --------------------------------------------------------------------------- */
 
 function drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys, test) {
 
+  // set height, width and margins
   var margin = {top: 10, right: 130, bottom: 20, left: 55},
     width = 750 - margin.left - margin.right,
     height = 325 - margin.top - margin.bottom;
@@ -20,7 +25,9 @@ function drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys, test
   var yAxis = d3.svg.axis().scale(y).orient("left");
 
   // enable scatterplot dots to be colored
-  var color = d3.scale.category10();
+  var color = {"Africa": "#808080", "Americas": "#fcd703", "Asia": "#4a36fc", "Europe": "#7ce7ca", "Oceania": "#ff6666"};
+  // var color = d3.scale.category10();
+
 
   // append scatterplot svg to html body
   var svg = d3.select("#scatter").append("svg")
@@ -79,17 +86,6 @@ function drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys, test
       .style("text-anchor", "end")
       .text("Population life expectancy (years)");
   
-  // // create graph title
-  // svg.append("g")
-  //     .attr("class", "title")
-  //   .append("text")
-  //     .attr("x", (width + margin.left + margin.right) * .032)
-  //     .attr("y", - margin.top / 1.7)
-  //     .attr("dx", ".71em")
-  //     .attr("font-size", "20px")
-  //     .style("text-anchor", "begin")
-  //     .text("Relation between physician density and population life expectancy");  
-  // console.log(ldata["SVK"]);
   // create dots
   scatterDot = svg.selectAll(".dot")
       .data(countryKeys)
@@ -98,8 +94,7 @@ function drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys, test
       .attr("r", function(d) { return rscale(+msdata[selectedYear][d][scatDotSize]); })
       .attr("cx", function(d) { return x(+msdata[selectedYear][d][scatXVar]); })
       .attr("cy", function(d) { return y(+msdata[selectedYear][d][scatYVar]); })
-      .style("fill", function(d) { return color(ldata[d].Continent); });
-      // .style("fill", function(d) { return color(+msdata[selectedYear][d]); })
+      .style("fill", function(d) { return color[ldata[d].Continent]; });
 
   // create legend with data selection functionality on click
   var continents = ["Africa", "Americas", "Asia", "Europe", "Oceania"]
@@ -107,25 +102,25 @@ function drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys, test
       .data(continents)
     .enter().append("g")
       .attr("class", "legend")
-      .attr("transform", function(d, i) { return "translate(" + (width + margin.right - 70) + "," + i * 7 + ")"; })
+      .attr("transform", function(d, i) { return "translate(" + (width + 15) + "," + i * 20 + ")"; })
       .on('click', function(continent) { return legendSelect(continent); });
 
   // legend colored rectangles
   legend.append("rect")
       .data(continents)
       .attr("class", function(d) { return "dot " + d; })
-      .attr("width", 6)
-      .attr("height", 6)
-      .style("fill", color);
+      .attr("width", 15)
+      .attr("height", 15)
+      .style("fill", function(d) { return color[d]; });
 
   // legend text
   legend.append("text")
       .data(continents)
-      .attr("x", -5)
-      .attr("y", 3)
+      .attr("x", 20)
+      .attr("y", 8)
       .attr("dy", ".35em")
-      .style("text-anchor", "end")
-      .style("font-size", "6px")
+      .style("text-anchor", "start")
+      .style("font-size", "12px")
       .text(function (d) { return d; });  
 
   // map and scatterplot: enabling tooltip functionality
@@ -157,25 +152,23 @@ function drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys, test
 
   /* ---------------------------------------------------------------------------
   function legendSelect(region): 
-  highlight country in scatterplot by giving it a black line
+  highlight country dots from a continent in scatterplot by altering opacities
   --------------------------------------------------------------------------- */
   function legendSelect (continent) {
-    // if no subset of data has been clicked yet: clicked subset of data pops out
+    // if no continent was clicked yet: according countries highlighted
     if (clicked == 0) {
       d3.selectAll(".dot").style("opacity", .3).style("stroke-width", "1px").style("stroke", "white");
-      // the "replace" part: no spaces in the class name (see line 147)
       d3.selectAll("." + continent).style("opacity", 1);
       clickedData = continent
       clicked = 1;
     }
-    // if a selected data subset is clicked again: reset graph to no pop-outs
+    // if a continent is clicked again: reset plot to no highlighting
     else if (clicked == 1 && continent == clickedData) {
       d3.selectAll(".dot").style("opacity", 1).style("stroke-width", "1px").style("stroke", "white");
       clickedData = continent
       clicked = 0;
     } 
-    // if a data subset has been selected, but now another subset is clicked: 
-    // switch pop-out to last clicked subset
+    // continent already selected: switch highlight to last clicked subset
     else if (clicked == 1 && continent != clickedData) {
       d3.selectAll(".dot").style("opacity", .3);
       d3.selectAll("." + continent).style("opacity", 1).style("stroke-width", "1px").style("stroke", "white");
