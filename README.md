@@ -43,3 +43,5 @@ This project aims to let a user explore the effectiveness of health care on the 
 
 ### Hardest parts
 The hardest part is going to be the coloring of the map - I have not done that in previous weeks, so that is new.
+
+Copyright &copy; Rianne Schoon 2018
