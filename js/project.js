@@ -56,7 +56,7 @@ function initAll(error, msdata, ldata, translations) {
   var selectedYear = d3.select("#slider1").attr("value");
   d3.select("#slider1-value").text(selectedYear);
 
-  // keys: years, countrynames, variable keys (density / life)
+  // keys: years, countrynames, variable keys (health care / life)
   var yearKeys = Object.keys(msdata);
   var countryKeys = Object.keys(msdata[selectedYear]);
 
@@ -80,13 +80,13 @@ function initAll(error, msdata, ldata, translations) {
       // linechart: update axes and line highlighting
       if (y2Key[0] == selectedVar) {
         d3.select(".linechart").remove();
-        drawLineGraph(ldata, y2Key, selectedCountry, selectedVar, lineKeys, 
+        drawLineGraph(ldata, y2Key, selectedYear, selectedCountry, selectedVar, lineKeys, 
           yearKeys, y1Keys, lifeKeys, translations);
       }
       else if (y2Key[0] != selectedVar) {
         d3.select(".linechart").remove();
         y2Key[0] = selectedVar;
-        drawLineGraph(ldata, y2Key, selectedCountry, selectedVar, lineKeys, 
+        drawLineGraph(ldata, y2Key, selectedYear, selectedCountry, selectedVar, lineKeys, 
           yearKeys, y1Keys, lifeKeys, translations);
       };
 
@@ -96,35 +96,35 @@ function initAll(error, msdata, ldata, translations) {
         d3.select("#scatterTitleX-value").text(translations[scatXVar]);
         d3.select("#scatterTitleY-value").text(translations[scatYVar]);
         d3.select(".scatterchart").remove();
-        drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys);
+        drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys, translations);
       }
       else if (selectedVar == "GDP") {
         scatXVar = ["physicians"]; scatYVar = ["GDP"]; scatDotSize = ["LEP"];
         d3.select("#scatterTitleX-value").text(translations[scatXVar]);
         d3.select("#scatterTitleY-value").text(translations[scatYVar]);
         d3.select(".scatterchart").remove();
-        drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys);
+        drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys, translations);
       };
     }
     else if (selectedVar == "physicians" || selectedVar == "nurses" || selectedVar == "beds") {
       
       // linechart: update axes and line highlighting
       d3.select(".linechart").remove();
-      drawLineGraph(ldata, y2Key, selectedCountry, selectedVar, lineKeys, yearKeys, y1Keys, lifeKeys, translations);
+      drawLineGraph(ldata, y2Key, selectedYear, selectedCountry, selectedVar, lineKeys, yearKeys, y1Keys, lifeKeys, translations);
       
       // scatterplot: update title and chart
       scatXVar = [selectedVar]; scatYVar = ["LEP"]; scatDotSize = ["GDP"];
       d3.select("#scatterTitleX-value").text(translations[scatXVar]);
       d3.select("#scatterTitleY-value").text(translations[scatYVar]);
       d3.select(".scatterchart").remove();
-      drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys)
+      drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys, translations)
     };
   });
 
   // draw visualizations (default year 2000)
   drawWorldMap(msdata, selectedYear, selectedVar, countryKeys, ldata, selectedCountry, yearKeys, y1Keys, lifeKeys, translations);
-  drawLineGraph(ldata, y2Key, selectedCountry, selectedVar, lineKeys, yearKeys, y1Keys, lifeKeys, translations);
-  drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys);
+  drawLineGraph(ldata, y2Key, selectedYear, selectedCountry, selectedVar, lineKeys, yearKeys, y1Keys, lifeKeys, translations);
+  drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys, translations);
 
   // but do not show line chart already -> first user must select country
   // d3.selectAll(".linechart").remove();

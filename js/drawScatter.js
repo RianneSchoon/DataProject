@@ -9,7 +9,12 @@ highlights the dot. The axes update according to radio button selection.
 Rianne Schoon, 10742794
 --------------------------------------------------------------------------- */
 
-function drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys, test) {
+// global in scatterplot: keep track of subselection of data in scatterplot
+var clicked = 0;
+var clickedData;
+
+
+function drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys, translations) {
 
   // set height, width and margins
   var margin = {top: 10, right: 130, bottom: 20, left: 55},
@@ -36,10 +41,6 @@ function drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys, test
       .attr("height", height + margin.top + margin.bottom)
     .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")"); 
-
-  // global in scatterplot: keep track of subselection of data in scatterplot
-  var clicked = 0;
-  var clickedData;
 
   // data arrays
   var scatXArray = [], scatYArray = [], scatDotSizeArray = [];
@@ -142,38 +143,63 @@ function drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys, test
         .style("y", 20)
         .attr("style", "left:" + (mouse[0] + offsetL) + "px;top:" + (mouse[1] + offsetT)+"px")
         .html("<strong>Country:</strong> <span style='color:midnightblue'>" + d + "</span>" + "<br>" +
-          "<strong>GDP:</strong> <span style='color:midnightblue'>" + msdata[selectedYear][d]["GDP"] + "</span>");
+          "<strong>" + translations[scatXVar] + "</strong> <span style='color:midnightblue'>" + roundValues(msdata[selectedYear][d][scatXVar], 1) + "</span>" + "<br>" +
+          "<strong>" + translations[scatYVar] + "</strong> <span style='color:midnightblue'>" + roundValues(msdata[selectedYear][d][scatYVar], 1) + "</span>" + "<br>" + 
+          "<strong>" + translations[scatDotSize] + "</strong> <span style='color:midnightblue'>" + roundValues(msdata[selectedYear][d][scatDotSize], 1) + "</span>");
     })
 
   // when mouse moves away, tooltip disappears
   .on("mouseout",  function(d, i) {
     tooltip_s.classed("hidden", true);
   });
+};
 
-  /* ---------------------------------------------------------------------------
-  function legendSelect(region): 
-  highlight country dots from a continent in scatterplot by altering opacities
-  --------------------------------------------------------------------------- */
-  function legendSelect (continent) {
-    // if no continent was clicked yet: according countries highlighted
-    if (clicked == 0) {
-      d3.selectAll(".dot").style("opacity", .3).style("stroke-width", "1px").style("stroke", "white");
-      d3.selectAll("." + continent).style("opacity", 1);
-      clickedData = continent
-      clicked = 1;
-    }
-    // if a continent is clicked again: reset plot to no highlighting
-    else if (clicked == 1 && continent == clickedData) {
-      d3.selectAll(".dot").style("opacity", 1).style("stroke-width", "1px").style("stroke", "white");
-      clickedData = continent
-      clicked = 0;
-    } 
-    // continent already selected: switch highlight to last clicked subset
-    else if (clicked == 1 && continent != clickedData) {
-      d3.selectAll(".dot").style("opacity", .3);
-      d3.selectAll("." + continent).style("opacity", 1).style("stroke-width", "1px").style("stroke", "white");
-      clickedData = continent
-      clicked = 1;
-    } 
-  };
+/* ---------------------------------------------------------------------------
+function dotSelect(country): 
+data highlighting: clicking on map makes strokes dot in scatterplot black
+--------------------------------------------------------------------------- */
+function dotSelect (country) {
+  d3.select("#scatter").selectAll(".dot")
+    .style("stroke", "white")
+    .style("opacity", ".3")
+  d3.select("#scatter").select("." + country)
+    .style("stroke", "black")
+    .style("stroke-width", "2px")
+    .style("opacity", "1");
+};
+
+/* ---------------------------------------------------------------------------
+function roundValues(value, precision): 
+rounds values to 1 decimal place
+--------------------------------------------------------------------------- */
+function roundValues(value, precision) {
+  var multiplier = Math.pow(10, precision || 0);
+  return Math.round(value * multiplier) / multiplier;
+};
+
+/* ---------------------------------------------------------------------------
+function legendSelect(continent): 
+highlight country dots from a continent in scatterplot by altering opacities
+--------------------------------------------------------------------------- */
+function legendSelect (continent) {
+  // if no continent was clicked yet: according countries highlighted
+  if (clicked == 0) {
+    d3.selectAll(".dot").style("opacity", .3).style("stroke-width", "1px").style("stroke", "white");
+    d3.selectAll("." + continent).style("opacity", 1).style("stroke", "#999999");
+    clickedData = continent
+    clicked = 1;
+  }
+  // if a continent is clicked again: reset plot to no highlighting
+  else if (clicked == 1 && continent == clickedData) {
+    d3.selectAll(".dot").style("opacity", 1).style("stroke-width", "1px").style("stroke", "white");
+    clickedData = continent
+    clicked = 0;
+  } 
+  // continent already selected: switch highlight to last clicked subset
+  else if (clicked == 1 && continent != clickedData) {
+    d3.selectAll(".dot").style("opacity", .3).style("stroke-width", "1px").style("stroke", "white");
+    d3.selectAll("." + continent).style("opacity", 1).style("stroke-width", "1px").style("stroke", "#999999");
+    clickedData = continent
+    clicked = 1;
+  } 
 };

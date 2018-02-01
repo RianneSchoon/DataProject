@@ -35,7 +35,6 @@ function drawWorldMap(msdata, selectedYear, selectdVar, countryKeys, ldata, sele
     projection: 'mercator',
 
     // countries colored based on data
-    // quantize scale -> naar kijken!! d3.scale.quantize
     fills: {
       defaultFill: "gainsboro"},
     data: countrycolor,
@@ -76,7 +75,7 @@ function drawWorldMap(msdata, selectedYear, selectdVar, countryKeys, ldata, sele
       // update linechart and title
       d3.select("#noDataText").style("display", "none");
       d3.selectAll(".linechart").remove();
-      drawLineGraph(ldata, y2Key, selectedCountry, selectedVar, lineKeys, yearKeys, y1Keys, lifeKeys, translations);
+      drawLineGraph(ldata, y2Key, selectedYear, selectedCountry, selectedVar, lineKeys, yearKeys, y1Keys, lifeKeys, translations);
       d3.select("#lineTitleY2-value").text(translations[selectedVar]);
       // highlight country dot in scatterplot
       dotSelect(selectedCountry);
@@ -102,7 +101,10 @@ function drawWorldMap(msdata, selectedYear, selectdVar, countryKeys, ldata, sele
       map.updateChoropleth(countrycolor);
     });
     d3.selectAll(".scatterchart").remove();
-    drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys);
+    drawScatter(msdata, ldata, selectedYear, selectedVar, countryKeys, translations);
+    d3.select(".linechart").remove();
+    drawLineGraph(ldata, y2Key, selectedYear, selectedCountry, selectedVar, lineKeys, yearKeys, y1Keys, lifeKeys, translations);
+      
   });
   
   // map dragging and zooming functionality
@@ -140,4 +142,82 @@ function drawWorldMap(msdata, selectedYear, selectdVar, countryKeys, ldata, sele
       .style("text-anchor", "start")
       .style("font-size", "12px")
       .text(function(d) { return d});
+};
+
+/* ---------------------------------------------------------------------------
+function calcColDomain(msdata, selectedVar, yearKeys, countryKeys): 
+determine map coloring domain.
+--------------------------------------------------------------------------- */
+function calcColDomain(msdata, selectedVar, yearKeys, countryKeys) {
+
+  // empty arrays to fill according to data
+  countrycolor = {};
+  varValues = [];
+  extValues = [];
+  colDomain = [];
+
+  // get data for the selected country and variable in array
+  yearKeys.forEach(function(year) {
+    countryKeys.forEach(function(land) {
+      varValues.push(+msdata[year][land][selectedVar]);
+    });
+  });
+
+  // array to calculate extent of not-null data
+  yearKeys.forEach(function(year) {
+    countryKeys.forEach(function(land) {
+      if (msdata[year][land][selectedVar] != 0 && msdata[year][land][selectedVar] != "") {
+        extValues.push(+msdata[year][land][selectedVar]);
+      }
+    });
+  });
+
+  // determine coloring domain scale (7 color shades according to data maximum)
+  var varExt = d3.extent(extValues);
+  var varStep = (varExt[1] - varExt[0]) / 7;
+
+  // countries with missing data ('null' values) must retain gainsboro gray color
+  var coloring = varExt[0];
+
+  // fill domain array
+  for (var i = 0; i < 8; i++) {
+    colDomain.push(roundValues(coloring, 1));
+    coloring += varStep;
+  };
+
+  // return coloring domain according to data
+  return colDomain;
+};
+
+/* ---------------------------------------------------------------------------
+function calcColRange(selectedVar): 
+determine map coloring range
+--------------------------------------------------------------------------- */
+function calcColRange(selectedVar) {
+
+  // function returns color range variable
+  var colrange;
+
+  // physicians blue, nurses orange, beds green, LEP red, GDP purple
+  if (selectedVar == "physicians") {
+    colRange = ["gainsboro", "#d3e9f8", "#a8d2f0", "#7cbce9", "#51a5e1", "#258fda", "#1e72ae", "#165683"];
+  } if (selectedVar == "nurses") {
+    colRange = ["gainsboro", "#ffe4cc", "#ffc999", "#ffad66", "#ff9233", "#ff7700", "#cc5f00", "#994700"];
+  } if (selectedVar == "beds") {
+    colRange = ["gainsboro", "#d7f4d7", "#afe9af", "#87de87", "#5fd35f", "#37c837", "#2ca02c", "#217821"];
+  } if (selectedVar == "LEP") {
+    colRange = ["gainsboro", "#f7d4d4", "#efa9a9", "#e77e7e", "#df5353", "#d62728", "#ac2020", "#811818"];
+  } if (selectedVar == "GDP") {
+    colRange = ["gainsboro", "#e6dcef", "#cdb8e0", "#b395d0", "#9a71c1", "#814eb1", "#673e8e", "#4d2f6a"];
+  };
+  return colRange;
+};
+
+/* ---------------------------------------------------------------------------
+function roundValues(value, precision): 
+rounds values to 1 decimal place
+--------------------------------------------------------------------------- */
+function roundValues(value, precision) {
+  var multiplier = Math.pow(10, precision || 0);
+  return Math.round(value * multiplier) / multiplier;
 };

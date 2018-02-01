@@ -157,7 +157,7 @@ header {
   background-size: cover;
   color: #cfcfcf;
   position: relative;
-  height: 100%;
+  height: 50%;
 }
 header p {
   color: rgba(255,255,255,0.8);
