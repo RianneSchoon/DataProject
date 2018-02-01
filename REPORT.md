@@ -1,10 +1,7 @@
 # Report Programming project Dataprocessing
 ### Rianne Schoon 12724794
 
-<!-- based on your design document, containing important decisions that you’ve made, e.g. where you changed your mind during the past weeks. This is how you show the reviewer that you actually understand what you have done. -->
-
 ## My application 
-<!-- Start with a short description of your application (like in the README.md, but very short, including a single screen shot). -->
 
 ### Do you want to live a long, healthy life? 
 Most people do! However, even if you avoid accidents and murderers, you still have to face disease, infections, and eventually wear and tear due to old age - to eternity. Nonetheless, we still try to prolong our lifes as much as possible. The success of this endeavor varies greatly. 
